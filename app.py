@@ -7,14 +7,7 @@ import json
 app = Flask(__name__)
 
 
-# Conexion a Redis
-r = redis.Redis(
-    host='localhost',
-    port=6379,
-    decode_responses=True
-)
-print("Conectado a Redis")
-
+# Conexion a Redis (config/redis_config.py)
 
 # Conexion a Cassandra
 cluster = Cluster(['127.0.0.1'], port=9042)
