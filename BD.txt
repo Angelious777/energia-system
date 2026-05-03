@@ -1,0 +1,40 @@
+Redis no necesita configuracion previa
+
+para Cassandra hay que tener esto:
+
+(imagen del docker de Cassandra corriendo)
+(TIENE QUE ESTAR CON ESTE PUERTO SI O SI)
+docker run -d --name cassandra --hostname cassandra --network cassandra -p 9042:9042 cassandra
+
+docker exec -it cassandra cqlsh  (ejecutar en el CMD la conexion a cqlsh)
+
+CREATE KEYSPACE energia
+WITH replication = {
+  'class':'SimpleStrategy',
+  'replication_factor':1
+};
+
+
+USE energia;
+
+
+CREATE TABLE consumos (
+
+    id_dispositivo text,
+    fecha timestamp,
+
+    zona text,
+
+    potencia double,
+    voltaje double,
+    corriente double,
+
+    temperatura double,
+
+    movimiento boolean,
+
+    estado text,
+
+    PRIMARY KEY (id_dispositivo, fecha)
+
+) WITH CLUSTERING ORDER BY (fecha DESC);
