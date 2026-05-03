@@ -18,23 +18,21 @@ WITH replication = {
 USE energia;
 
 
-CREATE TABLE consumos (
+CREATE TABLE consumo_por_dispositivo (
+    dispositivo_id TEXT,
+    fecha DATE,
+    timestamp TIMESTAMP,
+    consumo DOUBLE,
+    zona TEXT,
+    PRIMARY KEY ((dispositivo_id, fecha), timestamp)
+) WITH CLUSTERING ORDER BY (timestamp DESC);
 
-    id_dispositivo text,
-    fecha timestamp,
 
-    zona text,
-
-    potencia double,
-    voltaje double,
-    corriente double,
-
-    temperatura double,
-
-    movimiento boolean,
-
-    estado text,
-
-    PRIMARY KEY (id_dispositivo, fecha)
-
-) WITH CLUSTERING ORDER BY (fecha DESC);
+CREATE TABLE consumo_por_zona (
+    zona TEXT,
+    fecha DATE,
+    timestamp TIMESTAMP,
+    consumo DOUBLE,
+    dispositivo_id TEXT,
+    PRIMARY KEY ((zona, fecha), timestamp)
+) WITH CLUSTERING ORDER BY (timestamp DESC);

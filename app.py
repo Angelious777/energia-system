@@ -1,39 +1,29 @@
 from flask import Flask, request
-from cassandra.cluster import Cluster
-import redis
+from services.stream_service import publicar_evento
+from datetime import datetime
+import uuid
 
 app = Flask(__name__)
-
-
-# Conexion a Redis
-r = redis.Redis(
-    host='localhost',
-    port=6379,
-    decode_responses=True
-)
-print("Conectado a Redis")
-
-
-# Conexion a Cassandra
-cluster = Cluster(['127.0.0.1'], port=9042)
-session = cluster.connect('energia')
-print("Conectado a Cassandra")
-
 
 @app.route('/consumo', methods=['POST'])
 def registrar_consumo():
 
     data = request.json
 
-    print(data)
-    
-    r.set(
-        "LUZ_AULA_1:potencia",
-        data["potencia"]
-    )
-
-    return {
-        "mensaje": "dato recibido"
+    evento = {
+        "event_id": str(uuid.uuid4()),
+        "dispositivo_id": data["dispositivo_id"],
+        "zona": data["zona"],
+        "consumo": str(data["consumo"]),
+        "timestamp": datetime.now().isoformat()
     }
 
-app.run(debug=True)
+    publicar_evento(evento)
+
+    return {
+        "mensaje": "Evento enviado al stream",
+        "evento": evento
+    }
+
+if __name__ == '__main__':
+    app.run(debug=True)
