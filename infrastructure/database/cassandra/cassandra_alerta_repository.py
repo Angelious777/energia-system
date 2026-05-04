@@ -8,13 +8,13 @@ class CassandraAlertaRepository(AlertaRepository):
     def guardar(self, alerta: Alerta) -> None:
         query = """
         INSERT INTO alertas (alerta_id, dispositivo_id, zona, consumo, severidad, recomendacion, timestamp, fecha)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+        VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
         """
         fecha = alerta.timestamp.date().isoformat()
         session.execute(query, (str(alerta.alerta_id), alerta.dispositivo_id, alerta.zona, alerta.consumo, alerta.severidad, alerta.recomendacion, alerta.timestamp, fecha))
 
     def obtener_por_fecha(self, fecha: str) -> List[Alerta]:
-        query = "SELECT * FROM alertas WHERE fecha = ? ALLOW FILTERING"
+        query = "SELECT * FROM alertas WHERE fecha = %s ALLOW FILTERING"
         rows = session.execute(query, (fecha,))
         alertas = []
         for row in rows:
@@ -31,7 +31,7 @@ class CassandraAlertaRepository(AlertaRepository):
         return alertas
 
     def obtener_por_dispositivo(self, dispositivo_id: str, fecha: str) -> List[Alerta]:
-        query = "SELECT * FROM alertas WHERE dispositivo_id = ? AND fecha = ? ALLOW FILTERING"
+        query = "SELECT * FROM alertas WHERE dispositivo_id = %s AND fecha = %s ALLOW FILTERING"
         rows = session.execute(query, (dispositivo_id, fecha))
         alertas = []
         for row in rows:
