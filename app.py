@@ -1,36 +1,29 @@
 from flask import Flask, request
-from services.stream_service import publicar_evento
-from services.cassandra_service import obtener_historial
-from services.estadistica_service import obtener_estadisticas_alertas, top_dispositivos_alertas, estadisticas_zona, obtener_resumen_dashboard
-from services.health_service import verificar_health
-from services.recomendacion_service import obtener_recomendaciones
-from services.alerta_service import obtener_alertas_historicas
-from services.cache_service import obtener_consumo_zona
-from config.redis_config import redis_client
+from domain.services.stream_service import publicar_evento
+from infrastructure.database.cassandra.cassandra_consumo_repository import CassandraConsumoRepository
+from domain.services.estadistica_service import obtener_estadisticas_alertas, top_dispositivos_alertas, estadisticas_zona
+from application.use_cases.verificar_health import verificar_health
+from application.use_cases.obtener_recomendaciones import obtener_recomendaciones
+from application.use_cases.obtener_alertas_historicas import obtener_alertas_historicas
+from application.use_cases.obtener_dashboard import obtener_resumen_dashboard
+from domain.services.cache_service import obtener_consumo_zona
+from infrastructure.database.redis.redis_config import redis_client
 from datetime import datetime
 import uuid
 
+# Importar blueprints de los controllers
+from interfaces.api.consumo_controller import consumo_bp
+from interfaces.api.alerta_controller import alerta_bp
+from interfaces.api.dashboard_controller import dashboard_bp
+from interfaces.api.health_controller import health_bp
+
 app = Flask(__name__)
 
-@app.route('/consumo', methods=['POST'])
-def registrar_consumo():
-
-    data = request.json
-
-    evento = {
-        "event_id": str(uuid.uuid4()),
-        "dispositivo_id": data["dispositivo_id"],
-        "zona": data["zona"],
-        "consumo": str(data["consumo"]),
-        "timestamp": datetime.now().isoformat()
-    }
-
-    publicar_evento(evento)
-
-    return {
-        "mensaje": "Evento enviado al stream",
-        "evento": evento
-    }
+# Registrar blueprints
+app.register_blueprint(consumo_bp)
+app.register_blueprint(alerta_bp)
+app.register_blueprint(dashboard_bp)
+app.register_blueprint(health_bp)
 
 
 @app.route('/ultimo-consumo/<dispositivo_id>')
@@ -52,37 +45,19 @@ def obtener_ultimo_consumo(dispositivo_id):
     }
 
 
-@app.route('/alertas')
-def obtener_alertas():
-
-    alertas = redis_client.xrevrange(
-        "alertas_stream",
-        count=20
-    )
-
-    resultado = []
-
-    for alerta_id, datos in alertas:
-
-        resultado.append({
-            "id": alerta_id,
-            "datos": datos
-        })
-
-    return {
-        "total": len(resultado),
-        "alertas": resultado
-    }
-
-
 @app.route('/historial/<dispositivo_id>/<fecha>')
 def historial(dispositivo_id, fecha):
-
-    datos = obtener_historial(
-        dispositivo_id,
-        fecha
-    )
-
+    repository = CassandraConsumoRepository()
+    consumos = repository.obtener_historial(dispositivo_id, fecha)
+    datos = []
+    for consumo in consumos:
+        datos.append({
+            "dispositivo_id": consumo.dispositivo_id,
+            "fecha": consumo.timestamp.date().isoformat(),
+            "timestamp": str(consumo.timestamp),
+            "consumo": consumo.consumo,
+            "zona": consumo.zona
+        })
     return {
         "total": len(datos),
         "datos": datos
@@ -119,12 +94,6 @@ def obtener_estadisticas_zona(zona, fecha):
     return resultado
 
 
-@app.route('/health')
-def health():
-
-    return verificar_health()
-
-
 @app.route('/recomendaciones/<fecha>')
 def recomendaciones(fecha):
 
@@ -137,31 +106,6 @@ def recomendaciones(fecha):
 
 
 
-@app.route('/alertas/historico/<fecha>')
-def alertas_historicas(fecha):
-
-    resultado = obtener_alertas_historicas(fecha)
-
-    return {
-        "total": len(resultado),
-        "alertas": resultado
-    }
-
-
-@app.route('/dashboard/resumen/<fecha>')
-def resumen_dashboard(fecha):
-
-    resultado = obtener_resumen_dashboard(fecha)
-
-    return resultado
-
-
-@app.route('/zona/<zona>/consumo-actual')
-def consumo_actual_zona(zona):
-
-    resultado = obtener_consumo_zona(zona)
-
-    return resultado
 
 if __name__ == '__main__':
     app.run(debug=True)

@@ -1,4 +1,4 @@
-from config.redis_config import redis_client
+from infrastructure.database.redis.redis_config import redis_client
 
 def guardar_cache_zona(evento):
 
