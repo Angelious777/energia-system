@@ -1,4 +1,4 @@
-from config.redis_config import redis_client
+from infrastructure.database.redis.redis_config import redis_client
 
 pubsub = redis_client.pubsub()
 

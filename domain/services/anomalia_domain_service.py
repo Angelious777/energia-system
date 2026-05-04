@@ -1,4 +1,4 @@
-from config.redis_config import redis_client
+from infrastructure.database.redis.redis_config import redis_client
 
 def detectar_anomalia_consecutiva(
     dispositivo_id,

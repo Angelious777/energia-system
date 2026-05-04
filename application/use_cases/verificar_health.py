@@ -1,5 +1,5 @@
-from config.redis_config import redis_client
-from config.cassandra_config import session
+from infrastructure.database.redis.redis_config import redis_client
+from infrastructure.database.cassandra.cassandra_config import session
 
 def verificar_health():
 
