@@ -143,3 +143,17 @@ DROP TABLE consumo_por_zona;
 DROP TABLE alertas;
 DROP TABLE alertas_por_dispositivo;
 DROP TABLE estadisticas_por_zona;
+
+
+SELECT * FROM consumo_por_dispositivo LIMIT 20;
+SELECT * FROM consumo_por_zona LIMIT 20;
+SELECT * FROM alertas LIMIT 20;
+SELECT * FROM alertas_por_dispositivo LIMIT 20;
+SELECT * FROM estadisticas_por_zona LIMIT 20;
+
+
+TRUNCATE TABLE consumo_por_dispositivo;
+TRUNCATE TABLE consumo_por_zona;
+TRUNCATE TABLE alertas;
+TRUNCATE TABLE alertas_por_dispositivo;
+TRUNCATE TABLE estadisticas_por_zona;

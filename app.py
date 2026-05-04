@@ -2,7 +2,13 @@ from flask import Flask, request, render_template, send_from_directory
 from domain.services.stream_service import publicar_evento
 import os
 from infrastructure.database.cassandra.cassandra_consumo_repository import CassandraConsumoRepository
-from domain.services.estadistica_service import obtener_estadisticas_alertas, top_dispositivos_alertas, estadisticas_zona
+from domain.services.estadistica_service import (
+    obtener_estadisticas_alertas,
+    top_dispositivos_alertas,
+    estadisticas_zona,
+    distribucion_zonas,
+    tendencia_consumo
+)
 from application.use_cases.verificar_health import verificar_health
 from application.use_cases.obtener_recomendaciones import obtener_recomendaciones
 from application.use_cases.obtener_alertas_historicas import obtener_alertas_historicas
@@ -208,10 +214,20 @@ def dashboard_by_date(fecha):
 @app.route('/alertas/<fecha>')
 def alertas_historicas(fecha):
     resultado = obtener_alertas_historicas(fecha)
-    return {
-        "total": len(resultado),
-        "alertas": resultado
-    }
+    return resultado
+
+
+@app.route('/dispositivos/<fecha>')
+def dispositivos_por_fecha(fecha):
+    resultado = top_dispositivos_alertas(fecha)
+    return resultado
+
+
+@app.route('/zonas/<fecha>')
+def zonas_por_fecha(fecha):
+    resultado = distribucion_zonas(fecha)
+    resultado['tendencia'] = tendencia_consumo(fecha)
+    return resultado
 
 
 # =========================================

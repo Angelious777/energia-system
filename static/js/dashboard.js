@@ -1,7 +1,8 @@
 // ========================================
 // CONFIGURACIÓN GLOBAL
 // ========================================
-const API_BASE = window.location.origin; // Usar la misma URL base
+const origin = window.location.origin;
+const API_BASE = origin && origin !== 'null' && origin !== 'file://' ? origin : 'http://127.0.0.1:5000'; // Usar la misma URL base
 const REFRESH_INTERVAL = 2000; // 2 segundos
 
 let charts = {};
