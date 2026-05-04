@@ -1,7 +1,8 @@
 from config.redis_config import redis_client
-from services.cassandra_service import guardar_consumo
+from services.cassandra_service import guardar_consumo, guardar_alerta
 from services.stream_service import guardar_cache_consumo, guardar_cache_zona, publicar_alerta
 from services.analisis_service import detectar_consumo_excesivo
+from services.alerta_service import generar_alerta
 
 STREAM_NAME = "consumo_stream"
 
@@ -22,9 +23,16 @@ while True:
 
             print(datos)
 
-            if detectar_consumo_excesivo(datos):
-                print("ALERTA: consumo excesivo")
-                publicar_alerta(datos)
+            alerta = generar_alerta(datos)
+
+            if alerta:
+
+                print("ALERTA DETECTADA:")
+                print(alerta)
+                
+                guardar_alerta(alerta)
+                
+                publicar_alerta(alerta)
 
             guardar_consumo(datos)
             guardar_cache_consumo(datos)

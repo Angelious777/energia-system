@@ -51,3 +51,31 @@ def obtener_historial(dispositivo_id, fecha):
         })
 
     return resultado
+
+
+def guardar_alerta(alerta):
+
+    query = """
+    INSERT INTO alertas (
+        fecha,
+        timestamp,
+        alerta_id,
+        dispositivo_id,
+        zona,
+        consumo,
+        severidad,
+        recomendacion
+    )
+    VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+    """
+
+    session.execute(query, (
+        alerta["fecha"],
+        alerta["timestamp"],
+        alerta["alerta_id"],
+        alerta["dispositivo_id"],
+        alerta["zona"],
+        alerta["consumo"],
+        alerta["severidad"],
+        alerta["recomendacion"]
+    ))

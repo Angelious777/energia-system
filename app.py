@@ -1,6 +1,7 @@
 from flask import Flask, request
 from services.stream_service import publicar_evento
 from services.cassandra_service import obtener_historial
+from services.estadistica_service import obtener_estadisticas_alertas
 from config.redis_config import redis_client
 from datetime import datetime
 import uuid
@@ -83,6 +84,13 @@ def historial(dispositivo_id, fecha):
         "datos": datos
     }
 
+
+@app.route('/estadisticas/alertas/<fecha>')
+def estadisticas_alertas(fecha):
+
+    resultado = obtener_estadisticas_alertas(fecha)
+
+    return resultado
 
 
 if __name__ == '__main__':
