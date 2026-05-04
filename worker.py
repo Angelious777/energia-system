@@ -20,7 +20,6 @@ while True:
 
         for mensaje_id, datos in mensajes:
 
-            print("\nEvento recibido:")
             print(datos)
 
             if detectar_consumo_excesivo(datos):
