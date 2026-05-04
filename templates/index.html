@@ -77,15 +77,15 @@
                 <div class="charts-grid">
                     <div class="panel-card">
                         <div class="panel-title"><h4>Consumo total</h4><span>Línea de tiempo</span></div>
-                        <canvas id="lineChart"></canvas>
+                        <div class="panel-chart"><canvas id="lineChart"></canvas></div>
                     </div>
                     <div class="panel-card">
                         <div class="panel-title"><h4>Alertas por severidad</h4><span>Conteo en tiempo real</span></div>
-                        <canvas id="lineAlertChart"></canvas>
+                        <div class="panel-chart"><canvas id="lineAlertChart"></canvas></div>
                     </div>
                     <div class="panel-card">
                         <div class="panel-title"><h4>Consumo por zona</h4><span>Top zonas</span></div>
-                        <canvas id="barZoneChart"></canvas>
+                        <div class="panel-chart"><canvas id="barZoneChart"></canvas></div>
                     </div>
                 </div>
 
@@ -95,6 +95,7 @@
                 </div>
             </section>
 
+            <!-- Sección Consumo con tamaños fijos -->
             <section class="view hidden" id="view-consumo">
                 <div class="section-header">
                     <div>
@@ -102,20 +103,37 @@
                         <h3>Consumo detallado</h3>
                     </div>
                 </div>
+                
+                <!-- KPIs condensados -->
                 <div class="kpi-grid condensed">
                     <div class="kpi-card small"><span>Zonas activas</span><h4 id="kpi-zonas">0</h4></div>
                     <div class="kpi-card small"><span>Alertas altas</span><h4 id="kpi-altas">0</h4></div>
                     <div class="kpi-card small"><span>Alertas medias</span><h4 id="kpi-medias">0</h4></div>
                     <div class="kpi-card small"><span>Alertas críticas</span><h4 id="kpi-criticas">0</h4></div>
                 </div>
+                
+                <!-- Charts con altura máxima fija -->
                 <div class="charts-grid">
+                    <!-- Tendencia de Consumo - GRANDE -->
                     <div class="panel-card large">
-                        <div class="panel-title"><h4>Tendencia de consumo</h4></div>
-                        <canvas id="trendChart"></canvas>
+                        <div class="panel-title">
+                            <h4>Tendencia de consumo</h4>
+                            <span>Últimas 24h</span>
+                        </div>
+                        <div class="panel-chart">
+                            <canvas id="trendChart"></canvas>
+                        </div>
                     </div>
+                    
+                    <!-- Consumo por Zona - GRANDE -->
                     <div class="panel-card large">
-                        <div class="panel-title"><h4>Consumo por zona</h4></div>
-                        <canvas id="doughnutZoneChart"></canvas>
+                        <div class="panel-title">
+                            <h4>Consumo por zona</h4>
+                            <span>Distribución actual</span>
+                        </div>
+                        <div class="panel-chart">
+                            <canvas id="doughnutZoneChart"></canvas>
+                        </div>
                     </div>
                 </div>
             </section>

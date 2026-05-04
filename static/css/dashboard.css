@@ -261,10 +261,21 @@ body.dark-theme {
     padding: 1.5rem;
     position: relative;
     height: 350px;
+    max-height: 450px;
+    overflow: hidden;
+}
+
+.chart-container .chart-frame {
+    height: 100%;
+    width: 100%;
+    overflow: hidden;
 }
 
 .chart-container canvas {
+    width: 100% !important;
+    height: 100% !important;
     max-height: 100%;
+    display: block;
 }
 
 /* ========================================

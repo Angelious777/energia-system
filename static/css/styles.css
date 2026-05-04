@@ -294,6 +294,47 @@ button {
     gap: 1rem;
 }
 
+/* Contenedor principal de gráficos con altura máxima fija */
+.panel-chart {
+    height: 300px;  /* Altura máxima fija */
+    width: 100%;
+    position: relative;
+    overflow: hidden;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.03);
+    backdrop-filter: blur(10px);
+}
+
+/* Gráficos específicos con altura máxima */
+#trendChart,
+#doughnutZoneChart,
+#lineChart,
+#lineAlertChart,
+#barZoneChart {
+    max-height: 300px !important;
+    width: 100% !important;
+}
+
+/* Ajuste para gráficos grandes en view-consumo */
+.charts-grid .panel-card.large .panel-chart {
+    height: 400px;  /* Más alto para gráficos grandes */
+}
+
+.charts-grid .panel-card.large canvas {
+    max-height: 400px !important;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .panel-chart {
+        height: 250px !important;
+    }
+    
+    .charts-grid .panel-card.large .panel-chart {
+        height: 300px !important;
+    }
+}
+
 .panel-title {
     display: flex;
     justify-content: space-between;
@@ -312,7 +353,10 @@ button {
 
 .panel-card canvas {
     min-height: 320px;
+    max-height: 100%;
+    height: 100% !important;
     width: 100% !important;
+    display: block;
 }
 
 .section-list {

@@ -10,6 +10,7 @@ from config.logging_config import logger
 from infrastructure.database.cassandra.cassandra_consumo_repository import CassandraConsumoRepository
 from domain.entities.consumo import Consumo
 import datetime
+import uuid
 
 repository_consumo = CassandraConsumoRepository()
 
@@ -29,18 +30,26 @@ def procesar_evento(datos):
         dispositivo_id = datos.get("dispositivo_id")
         consumo = float(datos.get("consumo", 0))
         zona = datos.get("zona")
+        event_id = datos.get("event_id") or str(uuid.uuid4())
+        timestamp_str = datos.get("timestamp")
 
         if not dispositivo_id or zona is None:
             raise ValueError("Datos incompletos")
+
+        if timestamp_str:
+            timestamp = datetime.datetime.fromisoformat(timestamp_str)
+        else:
+            timestamp = datetime.datetime.utcnow()
 
         # =========================
         # CREAR ENTIDAD (DDD REAL)
         # =========================
         consumo_obj = Consumo(
+            event_id=event_id,
             dispositivo_id=dispositivo_id,
-            consumo=consumo,
             zona=zona,
-            timestamp=datetime.datetime.utcnow()
+            consumo=consumo,
+            timestamp=timestamp
         )
 
         # =========================
@@ -102,7 +111,7 @@ while True:
 
         for stream, mensajes in eventos:
             for mensaje_id, datos in mensajes:
-                logger.info(f"Procesando evento: {mensaje_id}")
+                print(f"Procesando evento: {mensaje_id}")
 
                 procesar_evento(datos)
 
