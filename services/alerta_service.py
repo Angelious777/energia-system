@@ -1,5 +1,10 @@
 import uuid
 from datetime import datetime
+import os
+from dotenv import load_dotenv
+from config.cassandra_config import session
+
+load_dotenv()
 
 def generar_alerta(evento):
 
@@ -7,8 +12,20 @@ def generar_alerta(evento):
 
     severidad = None
     recomendacion = None
+    
+    UMBRAL_MEDIA = float(
+        os.getenv("UMBRAL_MEDIA")
+    )
 
-    if consumo > 140:
+    UMBRAL_ALTA = float(
+        os.getenv("UMBRAL_ALTA")
+    )
+
+    UMBRAL_CRITICA = float(
+        os.getenv("UMBRAL_CRITICA")
+    )
+
+    if consumo > UMBRAL_CRITICA:
 
         severidad = "CRITICA"
 
@@ -16,7 +33,7 @@ def generar_alerta(evento):
             "Apagar dispositivo inmediatamente"
         )
 
-    elif consumo > 120:
+    elif consumo > UMBRAL_ALTA:
 
         severidad = "ALTA"
 
@@ -24,7 +41,7 @@ def generar_alerta(evento):
             "Reducir consumo del dispositivo"
         )
 
-    elif consumo > 100:
+    elif consumo > UMBRAL_MEDIA:
 
         severidad = "MEDIA"
 
@@ -48,3 +65,33 @@ def generar_alerta(evento):
     }
 
     return alerta
+
+
+def obtener_alertas_historicas(fecha):
+
+    query = """
+    SELECT *
+    FROM alertas
+    WHERE fecha = %s
+    """
+
+    rows = session.execute(
+        query,
+        (fecha,)
+    )
+
+    resultado = []
+
+    for row in rows:
+
+        resultado.append({
+            "alerta_id": str(row.alerta_id),
+            "dispositivo_id": row.dispositivo_id,
+            "zona": row.zona,
+            "consumo": row.consumo,
+            "severidad": row.severidad,
+            "recomendacion": row.recomendacion,
+            "timestamp": str(row.timestamp)
+        })
+
+    return resultado

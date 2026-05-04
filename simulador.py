@@ -2,7 +2,7 @@ import requests
 import random
 import time
 
-SEGUNDOS_INTERVALO = 5
+SEGUNDOS_INTERVALO = 0.2
 
 URL = "http://127.0.0.1:5000/consumo"
 
