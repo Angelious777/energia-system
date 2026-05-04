@@ -1,5 +1,13 @@
+import os
+from dotenv import load_dotenv
 from cassandra.cluster import Cluster
 
-cluster = Cluster(['127.0.0.1'])
+load_dotenv()
 
-session = cluster.connect('energia')
+cluster = Cluster([
+    os.getenv("CASSANDRA_HOST")
+])
+
+session = cluster.connect(
+    os.getenv("CASSANDRA_KEYSPACE")
+)

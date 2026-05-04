@@ -36,3 +36,17 @@ CREATE TABLE consumo_por_zona (
     dispositivo_id TEXT,
     PRIMARY KEY ((zona, fecha), timestamp)
 ) WITH CLUSTERING ORDER BY (timestamp DESC);
+
+CREATE TABLE alertas (
+    fecha DATE,
+    timestamp TIMESTAMP,
+    alerta_id UUID,
+    dispositivo_id TEXT,
+    zona TEXT,
+    consumo DOUBLE,
+    severidad TEXT,
+    recomendacion TEXT,
+
+    PRIMARY KEY ((fecha), timestamp, alerta_id)
+)
+WITH CLUSTERING ORDER BY (timestamp DESC);

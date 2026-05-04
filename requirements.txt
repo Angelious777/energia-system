@@ -2,3 +2,4 @@ flask
 redis
 cassandra-driver
 requests
+python-dotenv

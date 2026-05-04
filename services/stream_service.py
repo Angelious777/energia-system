@@ -28,29 +28,26 @@ def guardar_cache_consumo(evento):
     )
 
 
-def guardar_cache_zona(evento):
+def publicar_alerta(alerta):
 
-    clave = f"consumo:zona:{evento['zona']}"
+    alerta_redis = {
 
-    redis_client.set(
-        clave,
-        evento["consumo"]
-    )
-
-    redis_client.expire(
-        clave,
-        60
-    )
-
-
-def publicar_alerta(evento):
+        "alerta_id": str(alerta["alerta_id"]),
+        "fecha": str(alerta["fecha"]),
+        "timestamp": str(alerta["timestamp"]),
+        "dispositivo_id": alerta["dispositivo_id"],
+        "zona": alerta["zona"],
+        "consumo": str(alerta["consumo"]),
+        "severidad": alerta["severidad"],
+        "recomendacion": alerta["recomendacion"]
+    }
 
     redis_client.publish(
         "consumo_excesivo",
-        str(evento)
+        str(alerta_redis)
     )
 
     redis_client.xadd(
         "alertas_stream",
-        evento
+        alerta_redis
     )

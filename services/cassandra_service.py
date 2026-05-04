@@ -22,3 +22,60 @@ def guardar_consumo(evento):
         float(evento["consumo"]),
         evento["zona"]
     ))
+
+
+def obtener_historial(dispositivo_id, fecha):
+
+    query = """
+    SELECT *
+    FROM consumo_por_dispositivo
+    WHERE dispositivo_id = %s
+    AND fecha = %s
+    """
+
+    rows = session.execute(
+        query,
+        (dispositivo_id, fecha)
+    )
+
+    resultado = []
+
+    for row in rows:
+
+        resultado.append({
+            "dispositivo_id": row.dispositivo_id,
+            "fecha": str(row.fecha),
+            "timestamp": str(row.timestamp),
+            "consumo": row.consumo,
+            "zona": row.zona
+        })
+
+    return resultado
+
+
+def guardar_alerta(alerta):
+
+    query = """
+    INSERT INTO alertas (
+        fecha,
+        timestamp,
+        alerta_id,
+        dispositivo_id,
+        zona,
+        consumo,
+        severidad,
+        recomendacion
+    )
+    VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+    """
+
+    session.execute(query, (
+        alerta["fecha"],
+        alerta["timestamp"],
+        alerta["alerta_id"],
+        alerta["dispositivo_id"],
+        alerta["zona"],
+        alerta["consumo"],
+        alerta["severidad"],
+        alerta["recomendacion"]
+    ))
