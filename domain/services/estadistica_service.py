@@ -40,6 +40,48 @@ def top_dispositivos_alertas(fecha):
     return resultado
 
 
+def distribucion_zonas(fecha):
+    repository = CassandraAlertaRepository()
+    alertas = repository.obtener_por_fecha(fecha)
+
+    zonas = {}
+    for alerta in alertas:
+        zonas.setdefault(alerta.zona, 0)
+        zonas[alerta.zona] += alerta.consumo
+
+    labels = []
+    values = []
+    for zona, consumo in sorted(zonas.items(), key=lambda item: item[1], reverse=True):
+        labels.append(zona)
+        values.append(round(consumo, 2))
+
+    return {
+        "labels": labels,
+        "values": values,
+        "summary": {
+            "zonas_activas": len(labels),
+            "consumo_total": round(sum(values), 2)
+        }
+    }
+
+
+def tendencia_consumo(fecha, max_points=12):
+    repository = CassandraAlertaRepository()
+    alertas = repository.obtener_por_fecha(fecha)
+
+    trend = {}
+    for alerta in alertas:
+        key = alerta.timestamp.strftime('%H:%M')
+        trend[key] = trend.get(key, 0) + alerta.consumo
+
+    labels = sorted(trend.keys())[-max_points:]
+    values = [round(trend[label], 2) for label in labels]
+
+    return {
+        "labels": labels,
+        "values": values
+    }
+
 
 def estadisticas_zona(zona, fecha):
     repository = CassandraAlertaRepository()

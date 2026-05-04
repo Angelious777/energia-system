@@ -1,12 +1,35 @@
 from infrastructure.database.cassandra.cassandra_config import session
 import datetime
 
+
+def _parse_timestamp(timestamp_value):
+    if isinstance(timestamp_value, datetime.datetime):
+        return timestamp_value
+
+    if isinstance(timestamp_value, str):
+        try:
+            return datetime.datetime.fromisoformat(timestamp_value)
+        except ValueError:
+            try:
+                return datetime.datetime.strptime(timestamp_value, "%Y-%m-%d %H:%M:%S.%f")
+            except ValueError:
+                return datetime.datetime.strptime(timestamp_value, "%Y-%m-%d %H:%M:%S")
+
+    raise ValueError(f"Timestamp no válido: {timestamp_value}")
+
+
+def _extract_fecha(timestamp_value):
+    if isinstance(timestamp_value, datetime.datetime):
+        return timestamp_value.date().isoformat()
+    if isinstance(timestamp_value, str):
+        return timestamp_value.split(" ")[0]
+    raise ValueError(f"Timestamp no válido: {timestamp_value}")
+
+
 def guardar_consumo(evento):
     """Guarda el consumo en la tabla consumo_por_dispositivo"""
-    fecha = evento["timestamp"].split(" ")[0]
-    
-    # Convertir string a datetime
-    timestamp_dt = datetime.datetime.strptime(evento["timestamp"], "%Y-%m-%d %H:%M:%S.%f")
+    timestamp_dt = _parse_timestamp(evento["timestamp"])
+    fecha = _extract_fecha(evento["timestamp"])
 
     query = """
     INSERT INTO consumo_por_dispositivo (
@@ -33,10 +56,8 @@ def guardar_consumo(evento):
 
 def guardar_consumo_zona(evento):
     """Guarda el consumo en la tabla consumo_por_zona"""
-    fecha = evento["timestamp"].split(" ")[0]
-    
-    # Convertir string a datetime
-    timestamp_dt = datetime.datetime.strptime(evento["timestamp"], "%Y-%m-%d %H:%M:%S.%f")
+    timestamp_dt = _parse_timestamp(evento["timestamp"])
+    fecha = _extract_fecha(evento["timestamp"])
 
     query = """
     INSERT INTO consumo_por_zona (

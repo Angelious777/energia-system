@@ -1,22 +1,36 @@
-Redis no necesita configuracion previa
+-- =========================================
+-- CONFIGURACIÓN DE CASSANDRA (DOCKER)
+-- =========================================
 
-para Cassandra hay que tener esto:
-
-(imagen del docker de Cassandra corriendo)
-(TIENE QUE ESTAR CON ESTE PUERTO SI O SI)
+-- Ejecutar Cassandra en Docker
 docker run -d --name cassandra --hostname cassandra --network cassandra -p 9042:9042 cassandra
 
-docker exec -it cassandra cqlsh  (ejecutar en el CMD la conexion a cqlsh)
+-- Acceder a la consola CQL
+docker exec -it cassandra cqlsh
+
+
+-- =========================================
+-- CREACIÓN DEL KEYSPACE
+-- =========================================
 
 CREATE KEYSPACE energia
 WITH replication = {
-  'class':'SimpleStrategy',
-  'replication_factor':1
+  'class': 'SimpleStrategy',
+  'replication_factor': 1
 };
+
+-- Nota:
+-- Para entornos productivos se recomienda replication_factor = 3
 
 
 USE energia;
 
+
+-- =========================================
+-- TABLA: CONSUMO POR DISPOSITIVO
+-- =========================================
+
+-- Permite consultar el consumo de un dispositivo en un día específico
 
 CREATE TABLE consumo_por_dispositivo (
     dispositivo_id TEXT,
@@ -28,6 +42,12 @@ CREATE TABLE consumo_por_dispositivo (
 ) WITH CLUSTERING ORDER BY (timestamp DESC);
 
 
+-- =========================================
+-- TABLA: CONSUMO POR ZONA
+-- =========================================
+
+-- Permite analizar consumo agrupado por zona
+
 CREATE TABLE consumo_por_zona (
     zona TEXT,
     fecha DATE,
@@ -36,6 +56,13 @@ CREATE TABLE consumo_por_zona (
     dispositivo_id TEXT,
     PRIMARY KEY ((zona, fecha), timestamp)
 ) WITH CLUSTERING ORDER BY (timestamp DESC);
+
+
+-- =========================================
+-- TABLA: ALERTAS (GENERAL)
+-- =========================================
+
+-- Permite consultar alertas por fecha
 
 CREATE TABLE alertas (
     fecha DATE,
@@ -50,3 +77,83 @@ CREATE TABLE alertas (
     PRIMARY KEY ((fecha), timestamp, alerta_id)
 )
 WITH CLUSTERING ORDER BY (timestamp DESC);
+
+
+-- =========================================
+-- TABLA: ALERTAS POR DISPOSITIVO (RECOMENDADA)
+-- =========================================
+
+-- Mejora consultas por dispositivo (denormalización)
+
+CREATE TABLE alertas_por_dispositivo (
+    dispositivo_id TEXT,
+    fecha DATE,
+    timestamp TIMESTAMP,
+    alerta_id UUID,
+    zona TEXT,
+    consumo DOUBLE,
+    severidad TEXT,
+    recomendacion TEXT,
+
+    PRIMARY KEY ((dispositivo_id, fecha), timestamp, alerta_id)
+)
+WITH CLUSTERING ORDER BY (timestamp DESC);
+
+
+-- =========================================
+-- (OPCIONAL) TABLA: ESTADÍSTICAS POR ZONA
+-- =========================================
+
+-- Permite almacenar métricas agregadas
+
+CREATE TABLE estadisticas_por_zona (
+    zona TEXT,
+    fecha DATE,
+    total_consumo DOUBLE,
+    promedio DOUBLE,
+
+    PRIMARY KEY ((zona, fecha))
+);
+
+
+-- =========================================
+-- CONSIDERACIONES IMPORTANTES
+-- =========================================
+
+-- 1. Cassandra es orientado a consultas:
+--    Se diseñan tablas según cómo se consulta, no por normalización.
+
+-- 2. Denormalización:
+--    Se duplican datos para mejorar rendimiento y evitar joins.
+
+-- 3. Clustering:
+--    Los datos se ordenan por timestamp para obtener registros recientes rápidamente.
+
+-- 4. Escalabilidad:
+--    Este diseño permite distribuir datos entre nodos fácilmente.
+
+-- 5. Uso en el sistema:
+--    - consumo_por_dispositivo → historial
+--    - consumo_por_zona → análisis por zona
+--    - alertas → registro de eventos críticos
+--    - alertas_por_dispositivo → consultas específicas
+
+DROP TABLE consumo_por_dispositivo;
+DROP TABLE consumo_por_zona;
+DROP TABLE alertas;
+DROP TABLE alertas_por_dispositivo;
+DROP TABLE estadisticas_por_zona;
+
+
+SELECT * FROM consumo_por_dispositivo LIMIT 20;
+SELECT * FROM consumo_por_zona LIMIT 20;
+SELECT * FROM alertas LIMIT 20;
+SELECT * FROM alertas_por_dispositivo LIMIT 20;
+SELECT * FROM estadisticas_por_zona LIMIT 20;
+
+
+TRUNCATE TABLE consumo_por_dispositivo;
+TRUNCATE TABLE consumo_por_zona;
+TRUNCATE TABLE alertas;
+TRUNCATE TABLE alertas_por_dispositivo;
+TRUNCATE TABLE estadisticas_por_zona;

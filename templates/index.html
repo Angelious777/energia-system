@@ -1,0 +1,288 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Energía System - Panel de Control Avanzado</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/modern-styles.css') }}">
+</head>
+<body class="dark-theme">
+    <!-- Loading Screen -->
+    <div class="loading-screen" id="loadingScreen">
+        <div class="loading-content">
+            <div class="loading-icon">
+                <i class="fas fa-bolt"></i>
+            </div>
+            <p>Inicializando sistema...</p>
+            <div class="loading-bar">
+                <div class="loading-progress"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="app-container">
+        <!-- Sidebar Mejorada -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-brand">
+                <div class="brand-icon">
+                    <i class="fas fa-bolt"></i>
+                </div>
+                <div class="brand-text">
+                    <h1>Energía</h1>
+                    <span>Control La Paz</span>
+                </div>
+            </div>
+            
+            <nav class="sidebar-menu">
+                <button class="sidebar-item active" data-view="dashboard" title="Dashboard">
+                    <i class="fas fa-chart-line"></i>
+                    <span>Dashboard</span>
+                </button>
+                <button class="sidebar-item" data-view="consumo" title="Consumo">
+                    <i class="fas fa-fire"></i>
+                    <span>Consumo</span>
+                </button>
+                <button class="sidebar-item" data-view="alertas" title="Alertas">
+                    <i class="fas fa-bell"></i>
+                    <span>Alertas</span>
+                    <span class="notification-badge" id="sidebar-alerts">0</span>
+                </button>
+                <button class="sidebar-item" data-view="recomendaciones" title="Recomendaciones">
+                    <i class="fas fa-lightbulb"></i>
+                    <span>Recomendaciones</span>
+                </button>
+                <button class="sidebar-item" data-view="historico" title="Histórico">
+                    <i class="fas fa-history"></i>
+                    <span>Histórico</span>
+                </button>
+            </nav>
+            
+            <div class="sidebar-bottom">
+                <button class="theme-toggle" id="theme-toggle">
+                    <i class="fas fa-moon"></i>
+                    <span>Modo Oscuro</span>
+                </button>
+                <div class="sidebar-status">
+                    <i class="fas fa-sync-alt fa-spin"></i>
+                    <span>Actualizando...</span>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Panel Ultra Moderno -->
+        <main class="main-panel">
+            <!-- Topbar Premium -->
+            <header class="topbar glass-effect">
+                <div class="topbar-content">
+                    <div class="topbar-title">
+                        <h2 id="page-title">Monitoreo Energético - La Paz</h2>
+                        <p class="topbar-subtitle">Sistema de control en tiempo real • Actualización cada 2s</p>
+                    </div>
+                    <div class="topbar-meta">
+                        <div class="status-indicator online">
+                            <i class="fas fa-circle"></i>
+                            <span>En vivo</span>
+                        </div>
+                        <div class="datetime-display">
+                            <span id="current-date">--</span>
+                            <span id="current-time">--</span>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Dashboard View Ultra Mejorada -->
+            <section class="view active" id="view-dashboard">
+                <div class="section-header">
+                    <div>
+                        <span class="eyebrow gradient-text">Resumen Ejecutivo</span>
+                        <h3>Panel de Control Principal</h3>
+                    </div>
+                    <div class="status-badge">
+                        <i class="fas fa-wifi"></i>
+                        <span>Conectado</span>
+                    </div>
+                </div>
+
+                <!-- KPIs Premium Grid -->
+                <div class="kpi-grid premium">
+                    <div class="kpi-card premium energy">
+                        <div class="kpi-icon">
+                            <i class="fas fa-bolt"></i>
+                        </div>
+                        <div class="kpi-content">
+                            <span class="kpi-label">Consumo Total</span>
+                            <h4 id="kpi-total">0 <span>kWh</span></h4>
+                            <div class="kpi-trend positive">
+                                <i class="fas fa-arrow-up"></i>
+                                <span>+12.5%</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="kpi-card premium devices">
+                        <div class="kpi-icon">
+                            <i class="fas fa-microchip"></i>
+                        </div>
+                        <div class="kpi-content">
+                            <span class="kpi-label">Activos</span>
+                            <h4 id="kpi-dispositivos">0</h4>
+                            <div class="kpi-status online">
+                                <span>En línea</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="kpi-card premium alerts">
+                        <div class="kpi-icon">
+                            <i class="fas fa-bell"></i>
+                        </div>
+                        <div class="kpi-content">
+                            <span class="kpi-label">Alertas</span>
+                            <h4 id="kpi-alertas">0</h4>
+                            <div class="kpi-status critical">
+                                <span id="alert-status">Normal</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="kpi-card premium critical">
+                        <div class="kpi-icon">
+                            <i class="fas fa-fire"></i>
+                        </div>
+                        <div class="kpi-content">
+                            <span class="kpi-label">Zona Crítica</span>
+                            <h4 id="kpi-zona">--</h4>
+                            <div class="kpi-trend warning">
+                                <i class="fas fa-exclamation-triangle"></i>
+                                <span>Monitorear</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Charts Grid Ultra Moderno -->
+                <div class="charts-grid modern">
+                    <div class="chart-card premium large">
+                        <div class="chart-header">
+                            <h5><i class="fas fa-chart-line me-2"></i>Consumo en Tiempo Real</h5>
+                            <div class="chart-stats">
+                                <span class="live-indicator"><i class="fas fa-circle text-success"></i> Live</span>
+                            </div>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="mainChart"></canvas>
+                        </div>
+                    </div>
+                    <div class="chart-card premium">
+                        <div class="chart-header">
+                            <h5><i class="fas fa-chart-pie me-2"></i>Distribución Zonas</h5>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="zoneChart"></canvas>
+                        </div>
+                    </div>
+                    <div class="chart-card premium">
+                        <div class="chart-header">
+                            <h5><i class="fas fa-chart-bar me-2"></i>Alertas por Severidad</h5>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="alertChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Top Devices Ultra Moderno -->
+                <div class="panel-card full-width">
+                    <div class="panel-header">
+                        <h5><i class="fas fa-list me-2"></i>Top 5 Dispositivos Críticos</h5>
+                    </div>
+                    <div class="devices-grid" id="topDevicesList"></div>
+                </div>
+            </section>
+
+            <!-- Otras vistas optimizadas (resumidas por espacio) -->
+            <section class="view hidden" id="view-consumo">
+                <!-- Contenido consumo optimizado -->
+                <div class="section-header">
+                    <div>
+                        <span class="eyebrow gradient-text">Análisis Detallado</span>
+                        <h3>Consumo por Zona y Tendencia</h3>
+                    </div>
+                </div>
+                <div class="charts-grid full-height">
+                    <div class="chart-card premium full-height">
+                        <canvas id="trendChart"></canvas>
+                    </div>
+                    <div class="chart-card premium full-height">
+                        <canvas id="zoneDoughnut"></canvas>
+                    </div>
+                </div>
+            </section>
+
+            <section class="view hidden" id="view-alertas">
+                <div class="section-header">
+                    <div>
+                        <span class="eyebrow gradient-text danger">Situación Actual</span>
+                        <h3>Alertas en Tiempo Real</h3>
+                    </div>
+                </div>
+                <div class="alerts-grid" id="alertsGrid"></div>
+            </section>
+
+            <section class="view hidden" id="view-recomendaciones">
+                <div class="section-header">
+                    <div>
+                        <span class="eyebrow gradient-text success">Optimización</span>
+                        <h3>Recomendaciones Inteligentes</h3>
+                    </div>
+                </div>
+                <div class="recommendations-grid" id="recommendationsGrid"></div>
+            </section>
+
+            <section class="view hidden" id="view-historico">
+                <div class="section-header">
+                    <div>
+                        <span class="eyebrow gradient-text">Historial Completo</span>
+                        <h3>Registro de Eventos</h3>
+                    </div>
+                </div>
+                <div class="table-container modern">
+                    <table class="modern-table">
+                        <thead>
+                            <tr>
+                                <th>#</th><th>Dispositivo</th><th>Zona</th><th>Consumo</th>
+                                <th>Severidad</th><th>Acción</th><th>Fecha</th>
+                            </tr>
+                        </thead>
+                        <tbody id="historyTable"></tbody>
+                    </table>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Toast Notification Premium -->
+    <div class="toast-container" id="toastContainer">
+        <div class="toast-notification" id="mainToast">
+            <div class="toast-content">
+                <div class="toast-icon">
+                    <i class="fas fa-bell"></i>
+                </div>
+                <div class="toast-message">
+                    <strong id="toastTitle">Nueva alerta</strong>
+                    <span id="toastMessage">Evento detectado en tiempo real</span>
+                </div>
+                <button class="toast-close" id="toastClose">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script src="{{ url_for('static', filename='js/modern-app.js') }}"></script>
+</body>
+</html>
