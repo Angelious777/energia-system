@@ -3,3 +3,5 @@ redis
 cassandra-driver
 requests
 python-dotenv
+flask-socketio
+eventlet

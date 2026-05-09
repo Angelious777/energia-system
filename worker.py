@@ -1,121 +1,186 @@
-from infrastructure.database.redis.redis_config import redis_client
-from domain.services.cassandra_service import guardar_alerta, guardar_consumo, guardar_consumo_zona
-from domain.services.stream_service import guardar_cache_consumo, publicar_alerta
-from domain.services.analisis_service import detectar_consumo_excesivo
-from domain.services.alerta_domain_service import generar_alerta
-from domain.services.anomalia_domain_service import detectar_anomalia_consecutiva
-from domain.services.cache_service import obtener_consumo_zona, guardar_cache_zona
-from config.logging_config import logger
-
-from infrastructure.database.cassandra.cassandra_consumo_repository import CassandraConsumoRepository
-from domain.entities.consumo import Consumo
+import time
 import datetime
 import uuid
 
-repository_consumo = CassandraConsumoRepository()
+from infrastructure.database.redis.redis_config import redis_client
+
+from infrastructure.database.cassandra.cassandra_consumo_repository import (
+    CassandraConsumoRepository
+)
+
+from application.services.procesar_consumo_service import (
+    procesar_consumo_service
+)
+
+from config.logging_config import logger
+
+
+# =========================================
+# CONFIG REDIS STREAMS
+# =========================================
 
 STREAM_NAME = "consumo_stream"
+GROUP_NAME = "grupo_consumo_energia"
+MIN_IDLE_TIME = 10000
 
-# Leer desde el inicio (más seguro para pruebas)
-ultimo_id = '0'
+CONSUMER_NAME = f"worker-{uuid.uuid4().hex[:6]}"
 
-logger.info("Worker escuchando eventos...")
+logger.info(f"Worker iniciado: {CONSUMER_NAME}")
 
+# =========================================
+# DEPENDENCIAS
+# =========================================
+
+cassandra_repository = CassandraConsumoRepository()
+
+
+# =========================================
+# UTILIDADES
+# =========================================
+
+def _normalize_stream_entry(datos):
+    parsed = {}
+
+    for key, value in datos.items():
+
+        if isinstance(key, bytes):
+            key = key.decode('utf-8', 'ignore')
+
+        if isinstance(value, bytes):
+            try:
+                value = value.decode('utf-8')
+            except Exception:
+                pass
+
+        parsed[key] = value
+
+    return parsed
+
+
+def _ensure_stream_group():
+    try:
+        redis_client.xgroup_create(
+            STREAM_NAME,
+            GROUP_NAME,
+            id='0',
+            mkstream=True
+        )
+    except Exception as e:
+        if 'BUSYGROUP' not in str(e):
+            logger.error(f"Error creando consumer group: {e}", exc_info=True)
+            raise
+
+
+# =========================================
+# PROCESAMIENTO PRINCIPAL
+# =========================================
 
 def procesar_evento(datos):
+    return procesar_consumo_service(datos, cassandra_repository)
+
+
+# =========================================
+# RECUPERACIÓN DE PENDIENTES
+# =========================================
+
+def recuperar_pendientes():
+
     try:
-        # =========================
-        # VALIDACIÓN Y NORMALIZACIÓN
-        # =========================
-        dispositivo_id = datos.get("dispositivo_id")
-        consumo = float(datos.get("consumo", 0))
-        zona = datos.get("zona")
-        event_id = datos.get("event_id") or str(uuid.uuid4())
-        timestamp_str = datos.get("timestamp")
-
-        if not dispositivo_id or zona is None:
-            raise ValueError("Datos incompletos")
-
-        if timestamp_str:
-            timestamp = datetime.datetime.fromisoformat(timestamp_str)
-        else:
-            timestamp = datetime.datetime.utcnow()
-
-        # =========================
-        # CREAR ENTIDAD (DDD REAL)
-        # =========================
-        consumo_obj = Consumo(
-            event_id=event_id,
-            dispositivo_id=dispositivo_id,
-            zona=zona,
-            consumo=consumo,
-            timestamp=timestamp
+        pendientes = redis_client.xpending_range(
+            STREAM_NAME,
+            GROUP_NAME,
+            min='-',
+            max='+',
+            count=10
         )
 
-        # =========================
-        # PERSISTENCIA
-        # =========================
-        guardar_consumo(vars(consumo_obj))
-        guardar_consumo_zona(vars(consumo_obj))
+        for mensaje in pendientes:
 
-        # =========================
-        # CACHE (REDIS)
-        # =========================
-        guardar_cache_consumo(vars(consumo_obj))
-        guardar_cache_zona(vars(consumo_obj))
+            mensaje_id = mensaje["message_id"]
+            idle = mensaje["time_since_delivered"]
+            consumidor = mensaje["consumer"]
 
-        # =========================
-        # DETECCIÓN DE ANOMALÍAS
-        # =========================
-        hay_anomalia = detectar_anomalia_consecutiva(
-            dispositivo_id,
-            consumo
-        )
+            if idle > MIN_IDLE_TIME:
 
-        if hay_anomalia:
-            alerta_obj = generar_alerta(vars(consumo_obj))
+                logger.warning(
+                    f"Recuperando mensaje {mensaje_id} de {consumidor}"
+                )
 
-            if alerta_obj:
-                alerta_dict = {
-                    "alerta_id": alerta_obj.alerta_id,
-                    "dispositivo_id": alerta_obj.dispositivo_id,
-                    "zona": alerta_obj.zona,
-                    "consumo": alerta_obj.consumo,
-                    "severidad": alerta_obj.severidad,
-                    "recomendacion": alerta_obj.recomendacion,
-                    "timestamp": alerta_obj.timestamp,
-                    "fecha": alerta_obj.timestamp.date().isoformat()
-                }
+                reclamado = redis_client.xclaim(
+                    STREAM_NAME,
+                    GROUP_NAME,
+                    CONSUMER_NAME,
+                    min_idle_time=MIN_IDLE_TIME,
+                    message_ids=[mensaje_id]
+                )
 
-                logger.warning(f"ALERTA DETECTADA: {alerta_dict}")
+                for msg_id, datos in reclamado:
 
-                guardar_alerta(alerta_dict)
-                publicar_alerta(alerta_dict)
+                    datos = _normalize_stream_entry(datos)
+
+                    if procesar_evento(datos):
+
+                        redis_client.xack(
+                            STREAM_NAME,
+                            GROUP_NAME,
+                            msg_id
+                        )
+
+                        logger.info(f"Mensaje recuperado ACK: {msg_id}")
 
     except Exception as e:
-        logger.error(f"Error procesando evento: {e}", exc_info=True)
+        logger.error(f"Error recuperando pendientes: {e}", exc_info=True)
 
 
-# =========================
+# =========================================
+# INIT STREAM GROUP
+# =========================================
+
+_ensure_stream_group()
+
+
+# =========================================
 # LOOP PRINCIPAL
-# =========================
+# =========================================
+
 while True:
+
     try:
-        eventos = redis_client.xread(
-            {STREAM_NAME: ultimo_id},
-            block=1000
+
+        recuperar_pendientes()
+
+        eventos = redis_client.xreadgroup(
+            GROUP_NAME,
+            CONSUMER_NAME,
+            {STREAM_NAME: ">"},
+            count=10,
+            block=5000
         )
 
         if not eventos:
             continue
 
         for stream, mensajes in eventos:
+
             for mensaje_id, datos in mensajes:
-                print(f"Procesando evento: {mensaje_id}")
 
-                procesar_evento(datos)
+                datos = _normalize_stream_entry(datos)
 
-                ultimo_id = mensaje_id
+                logger.info(f"Procesando evento: {mensaje_id}")
+
+                if procesar_evento(datos):
+
+                    redis_client.xack(
+                        STREAM_NAME,
+                        GROUP_NAME,
+                        mensaje_id
+                    )
+
+                    logger.info(f"ACK enviado: {mensaje_id}")
+
+                else:
+                    logger.warning(f"NO procesado: {mensaje_id}")
 
     except Exception as e:
-        logger.error(f"Error en el bucle principal: {e}", exc_info=True)
+        logger.error(f"Error worker principal: {e}", exc_info=True)
+        time.sleep(2)

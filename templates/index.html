@@ -3,286 +3,846 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Energía System - Panel de Control Avanzado</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <title>Energía System | Centro de Monitoreo Inteligente</title>
+
+    <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- FontAwesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+    <!-- CSS -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/modern-styles.css') }}">
 </head>
+
 <body class="dark-theme">
-    <!-- Loading Screen -->
-    <div class="loading-screen" id="loadingScreen">
-        <div class="loading-content">
-            <div class="loading-icon">
-                <i class="fas fa-bolt"></i>
-            </div>
-            <p>Inicializando sistema...</p>
-            <div class="loading-bar">
-                <div class="loading-progress"></div>
-            </div>
+
+<!-- ========================================= -->
+<!-- LOADING -->
+<!-- ========================================= -->
+
+<div class="loading-screen" id="loadingScreen">
+
+    <div class="loading-content">
+
+        <div class="loading-logo">
+            <i class="fas fa-bolt"></i>
         </div>
+
+        <h2>Inicializando Sistema</h2>
+
+        <p>Conectando nodos distribuidos...</p>
+
+        <div class="loading-bar">
+            <div class="loading-progress"></div>
+        </div>
+
     </div>
 
-    <div class="app-container">
-        <!-- Sidebar Mejorada -->
-        <aside class="sidebar" id="sidebar">
-            <div class="sidebar-brand">
+</div>
+
+<!-- ========================================= -->
+<!-- APP -->
+<!-- ========================================= -->
+
+<div class="app-layout">
+
+    <!-- ===================================== -->
+    <!-- SIDEBAR -->
+    <!-- ===================================== -->
+
+    <aside class="sidebar">
+
+        <div class="sidebar-top">
+
+            <div class="brand-container">
+
                 <div class="brand-icon">
                     <i class="fas fa-bolt"></i>
                 </div>
+
                 <div class="brand-text">
-                    <h1>Energía</h1>
-                    <span>Control La Paz</span>
+                    <h1>Energía System</h1>
+                    <span>La Paz - Bolivia</span>
                 </div>
+
             </div>
-            
-            <nav class="sidebar-menu">
-                <button class="sidebar-item active" data-view="dashboard" title="Dashboard">
-                    <i class="fas fa-chart-line"></i>
-                    <span>Dashboard</span>
-                </button>
-                <button class="sidebar-item" data-view="consumo" title="Consumo">
-                    <i class="fas fa-fire"></i>
-                    <span>Consumo</span>
-                </button>
-                <button class="sidebar-item" data-view="alertas" title="Alertas">
-                    <i class="fas fa-bell"></i>
-                    <span>Alertas</span>
-                    <span class="notification-badge" id="sidebar-alerts">0</span>
-                </button>
-                <button class="sidebar-item" data-view="recomendaciones" title="Recomendaciones">
-                    <i class="fas fa-lightbulb"></i>
-                    <span>Recomendaciones</span>
-                </button>
-                <button class="sidebar-item" data-view="historico" title="Histórico">
-                    <i class="fas fa-history"></i>
-                    <span>Histórico</span>
-                </button>
-            </nav>
-            
-            <div class="sidebar-bottom">
-                <button class="theme-toggle" id="theme-toggle">
-                    <i class="fas fa-moon"></i>
-                    <span>Modo Oscuro</span>
-                </button>
-                <div class="sidebar-status">
-                    <i class="fas fa-sync-alt fa-spin"></i>
-                    <span>Actualizando...</span>
-                </div>
-            </div>
-        </aside>
 
-        <!-- Main Panel Ultra Moderno -->
-        <main class="main-panel">
-            <!-- Topbar Premium -->
-            <header class="topbar glass-effect">
-                <div class="topbar-content">
-                    <div class="topbar-title">
-                        <h2 id="page-title">Monitoreo Energético - La Paz</h2>
-                        <p class="topbar-subtitle">Sistema de control en tiempo real • Actualización cada 2s</p>
-                    </div>
-                    <div class="topbar-meta">
-                        <div class="status-indicator online">
-                            <i class="fas fa-circle"></i>
-                            <span>En vivo</span>
-                        </div>
-                        <div class="datetime-display">
-                            <span id="current-date">--</span>
-                            <span id="current-time">--</span>
-                        </div>
-                    </div>
-                </div>
-            </header>
-
-            <!-- Dashboard View Ultra Mejorada -->
-            <section class="view active" id="view-dashboard">
-                <div class="section-header">
-                    <div>
-                        <span class="eyebrow gradient-text">Resumen Ejecutivo</span>
-                        <h3>Panel de Control Principal</h3>
-                    </div>
-                    <div class="status-badge">
-                        <i class="fas fa-wifi"></i>
-                        <span>Conectado</span>
-                    </div>
-                </div>
-
-                <!-- KPIs Premium Grid -->
-                <div class="kpi-grid premium">
-                    <div class="kpi-card premium energy">
-                        <div class="kpi-icon">
-                            <i class="fas fa-bolt"></i>
-                        </div>
-                        <div class="kpi-content">
-                            <span class="kpi-label">Consumo Total</span>
-                            <h4 id="kpi-total">0 <span>kWh</span></h4>
-                            <div class="kpi-trend positive">
-                                <i class="fas fa-arrow-up"></i>
-                                <span>+12.5%</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="kpi-card premium devices">
-                        <div class="kpi-icon">
-                            <i class="fas fa-microchip"></i>
-                        </div>
-                        <div class="kpi-content">
-                            <span class="kpi-label">Activos</span>
-                            <h4 id="kpi-dispositivos">0</h4>
-                            <div class="kpi-status online">
-                                <span>En línea</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="kpi-card premium alerts">
-                        <div class="kpi-icon">
-                            <i class="fas fa-bell"></i>
-                        </div>
-                        <div class="kpi-content">
-                            <span class="kpi-label">Alertas</span>
-                            <h4 id="kpi-alertas">0</h4>
-                            <div class="kpi-status critical">
-                                <span id="alert-status">Normal</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="kpi-card premium critical">
-                        <div class="kpi-icon">
-                            <i class="fas fa-fire"></i>
-                        </div>
-                        <div class="kpi-content">
-                            <span class="kpi-label">Zona Crítica</span>
-                            <h4 id="kpi-zona">--</h4>
-                            <div class="kpi-trend warning">
-                                <i class="fas fa-exclamation-triangle"></i>
-                                <span>Monitorear</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Charts Grid Ultra Moderno -->
-                <div class="charts-grid modern">
-                    <div class="chart-card premium large">
-                        <div class="chart-header">
-                            <h5><i class="fas fa-chart-line me-2"></i>Consumo en Tiempo Real</h5>
-                            <div class="chart-stats">
-                                <span class="live-indicator"><i class="fas fa-circle text-success"></i> Live</span>
-                            </div>
-                        </div>
-                        <div class="chart-container">
-                            <canvas id="mainChart"></canvas>
-                        </div>
-                    </div>
-                    <div class="chart-card premium">
-                        <div class="chart-header">
-                            <h5><i class="fas fa-chart-pie me-2"></i>Distribución Zonas</h5>
-                        </div>
-                        <div class="chart-container">
-                            <canvas id="zoneChart"></canvas>
-                        </div>
-                    </div>
-                    <div class="chart-card premium">
-                        <div class="chart-header">
-                            <h5><i class="fas fa-chart-bar me-2"></i>Alertas por Severidad</h5>
-                        </div>
-                        <div class="chart-container">
-                            <canvas id="alertChart"></canvas>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Top Devices Ultra Moderno -->
-                <div class="panel-card full-width">
-                    <div class="panel-header">
-                        <h5><i class="fas fa-list me-2"></i>Top 5 Dispositivos Críticos</h5>
-                    </div>
-                    <div class="devices-grid" id="topDevicesList"></div>
-                </div>
-            </section>
-
-            <!-- Otras vistas optimizadas (resumidas por espacio) -->
-            <section class="view hidden" id="view-consumo">
-                <!-- Contenido consumo optimizado -->
-                <div class="section-header">
-                    <div>
-                        <span class="eyebrow gradient-text">Análisis Detallado</span>
-                        <h3>Consumo por Zona y Tendencia</h3>
-                    </div>
-                </div>
-                <div class="charts-grid full-height">
-                    <div class="chart-card premium full-height">
-                        <canvas id="trendChart"></canvas>
-                    </div>
-                    <div class="chart-card premium full-height">
-                        <canvas id="zoneDoughnut"></canvas>
-                    </div>
-                </div>
-            </section>
-
-            <section class="view hidden" id="view-alertas">
-                <div class="section-header">
-                    <div>
-                        <span class="eyebrow gradient-text danger">Situación Actual</span>
-                        <h3>Alertas en Tiempo Real</h3>
-                    </div>
-                </div>
-                <div class="alerts-grid" id="alertsGrid"></div>
-            </section>
-
-            <section class="view hidden" id="view-recomendaciones">
-                <div class="section-header">
-                    <div>
-                        <span class="eyebrow gradient-text success">Optimización</span>
-                        <h3>Recomendaciones Inteligentes</h3>
-                    </div>
-                </div>
-                <div class="recommendations-grid" id="recommendationsGrid"></div>
-            </section>
-
-            <section class="view hidden" id="view-historico">
-                <div class="section-header">
-                    <div>
-                        <span class="eyebrow gradient-text">Historial Completo</span>
-                        <h3>Registro de Eventos</h3>
-                    </div>
-                </div>
-                <div class="table-container modern">
-                    <table class="modern-table">
-                        <thead>
-                            <tr>
-                                <th>#</th><th>Dispositivo</th><th>Zona</th><th>Consumo</th>
-                                <th>Severidad</th><th>Acción</th><th>Fecha</th>
-                            </tr>
-                        </thead>
-                        <tbody id="historyTable"></tbody>
-                    </table>
-                </div>
-            </section>
-        </main>
-    </div>
-
-    <!-- Toast Notification Premium -->
-    <div class="toast-container" id="toastContainer">
-        <div class="toast-notification" id="mainToast">
-            <div class="toast-content">
-                <div class="toast-icon">
-                    <i class="fas fa-bell"></i>
-                </div>
-                <div class="toast-message">
-                    <strong id="toastTitle">Nueva alerta</strong>
-                    <span id="toastMessage">Evento detectado en tiempo real</span>
-                </div>
-                <button class="toast-close" id="toastClose">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
         </div>
+
+        <!-- MENU -->
+
+        <nav class="sidebar-menu">
+
+            <button class="menu-item active" data-view="dashboard">
+                <i class="fas fa-chart-line"></i>
+                <span>Dashboard</span>
+            </button>
+
+            <button class="menu-item" data-view="consumo">
+                <i class="fas fa-bolt"></i>
+                <span>Consumo</span>
+            </button>
+
+            <button class="menu-item" data-view="alertas">
+                <i class="fas fa-triangle-exclamation"></i>
+                <span>Alertas</span>
+
+                <div class="notification-badge" id="sidebarAlertCount">
+                    0
+                </div>
+            </button>
+
+            <button class="menu-item" data-view="dispositivos">
+                <i class="fas fa-microchip"></i>
+                <span>Dispositivos</span>
+            </button>
+
+            <button class="menu-item" data-view="zonas">
+                <i class="fas fa-map-location-dot"></i>
+                <span>Zonas</span>
+            </button>
+
+            <button class="menu-item" data-view="recomendaciones">
+                <i class="fas fa-lightbulb"></i>
+                <span>Recomendaciones</span>
+            </button>
+
+            <button class="menu-item" data-view="historico">
+                <i class="fas fa-clock-rotate-left"></i>
+                <span>Histórico</span>
+            </button>
+
+            <button class="menu-item" data-view="infraestructura">
+                <i class="fas fa-server"></i>
+                <span>Infraestructura</span>
+            </button>
+
+        </nav>
+
+        <!-- FOOTER SIDEBAR -->
+
+        <div class="sidebar-footer">
+
+            <button class="theme-toggle" id="themeToggle">
+
+                <i class="fas fa-moon"></i>
+
+                <span>Modo Oscuro</span>
+
+            </button>
+
+            <div class="system-status">
+
+                <div class="status-dot"></div>
+
+                <span>Sistema Operativo</span>
+
+            </div>
+
+        </div>
+
+    </aside>
+
+    <!-- ===================================== -->
+    <!-- MAIN -->
+    <!-- ===================================== -->
+
+    <main class="main-content">
+
+        <!-- ================================= -->
+        <!-- TOPBAR -->
+        <!-- ================================= -->
+
+        <header class="topbar glass-effect">
+
+            <div class="topbar-left">
+
+                <h2 id="pageTitle">
+                    Centro de Monitoreo Inteligente
+                </h2>
+
+                <p>
+                    Arquitectura Distribuida con Redis Streams y Cassandra
+                </p>
+
+            </div>
+
+            <div class="topbar-right">
+
+                <div class="live-status">
+
+                    <div class="live-dot"></div>
+
+                    <span>LIVE</span>
+
+                </div>
+
+                <div class="datetime-container">
+
+                    <span id="currentDate">
+                        --
+                    </span>
+
+                    <span id="currentTime">
+                        --
+                    </span>
+
+                </div>
+
+            </div>
+
+        </header>
+
+        <!-- ================================= -->
+        <!-- DASHBOARD -->
+        <!-- ================================= -->
+
+        <section class="view active" id="view-dashboard">
+
+            <!-- ============================= -->
+            <!-- HEADER -->
+            <!-- ============================= -->
+
+            <div class="section-header">
+
+                <div>
+
+                    <span class="eyebrow">
+                        Resumen Ejecutivo
+                    </span>
+
+                    <h3>
+                        Dashboard Principal
+                    </h3>
+
+                </div>
+
+                <div class="dashboard-actions">
+
+                    <button class="action-btn">
+                        <i class="fas fa-download"></i>
+                        Exportar
+                    </button>
+
+                    <button class="action-btn">
+                        <i class="fas fa-filter"></i>
+                        Filtrar
+                    </button>
+
+                </div>
+
+            </div>
+
+            <!-- ============================= -->
+            <!-- KPIS -->
+            <!-- ============================= -->
+
+            <div class="kpi-grid">
+
+                <!-- KPI -->
+
+                <div class="kpi-card energy">
+
+                    <div class="kpi-icon">
+                        <i class="fas fa-bolt"></i>
+                    </div>
+
+                    <div class="kpi-info">
+
+                        <span>
+                            Consumo Total
+                        </span>
+
+                        <h4 id="kpiConsumo">
+                            0 kWh
+                        </h4>
+
+                        <small>
+                            Últimos eventos procesados
+                        </small>
+
+                    </div>
+
+                </div>
+
+                <!-- KPI -->
+
+                <div class="kpi-card devices">
+
+                    <div class="kpi-icon">
+                        <i class="fas fa-microchip"></i>
+                    </div>
+
+                    <div class="kpi-info">
+
+                        <span>
+                            Dispositivos
+                        </span>
+
+                        <h4 id="kpiDispositivos">
+                            0
+                        </h4>
+
+                        <small>
+                            Activos actualmente
+                        </small>
+
+                    </div>
+
+                </div>
+
+                <!-- KPI -->
+
+                <div class="kpi-card alerts">
+
+                    <div class="kpi-icon">
+                        <i class="fas fa-triangle-exclamation"></i>
+                    </div>
+
+                    <div class="kpi-info">
+
+                        <span>
+                            Alertas
+                        </span>
+
+                        <h4 id="kpiAlertas">
+                            0
+                        </h4>
+
+                        <small id="alertStatus">
+                            Sistema estable
+                        </small>
+
+                    </div>
+
+                </div>
+
+                <!-- KPI -->
+
+                <div class="kpi-card zones">
+
+                    <div class="kpi-icon">
+                        <i class="fas fa-fire"></i>
+                    </div>
+
+                    <div class="kpi-info">
+
+                        <span>
+                            Zona Crítica
+                        </span>
+
+                        <h4 id="kpiZona">
+                            --
+                        </h4>
+
+                        <small>
+                            Mayor consumo detectado
+                        </small>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- ============================= -->
+            <!-- CHARTS -->
+            <!-- ============================= -->
+
+            <div class="charts-grid">
+
+                <!-- CHART PRINCIPAL -->
+
+                <div class="chart-card large">
+
+                    <div class="card-header">
+
+                        <div>
+
+                            <h5>
+                                <i class="fas fa-chart-line"></i>
+                                Consumo en Tiempo Real
+                            </h5>
+
+                            <span>
+                                Actualización automática
+                            </span>
+
+                        </div>
+
+                        <div class="chart-live">
+
+                            <div class="live-dot"></div>
+
+                            <span>LIVE</span>
+
+                        </div>
+
+                    </div>
+
+                    <div class="chart-body">
+
+                        <canvas id="mainChart"></canvas>
+
+                    </div>
+
+                </div>
+
+                <!-- DONUT -->
+
+                <div class="chart-card">
+
+                    <div class="card-header">
+
+                        <h5>
+                            <i class="fas fa-chart-pie"></i>
+                            Distribución por Zona
+                        </h5>
+
+                    </div>
+
+                    <div class="chart-body">
+
+                        <canvas id="zoneChart"></canvas>
+
+                    </div>
+
+                </div>
+
+                <!-- ALERTAS -->
+
+                <div class="chart-card">
+
+                    <div class="card-header">
+
+                        <h5>
+                            <i class="fas fa-chart-bar"></i>
+                            Alertas por Severidad
+                        </h5>
+
+                    </div>
+
+                    <div class="chart-body">
+
+                        <canvas id="alertChart"></canvas>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- ============================= -->
+            <!-- GRID INFERIOR -->
+            <!-- ============================= -->
+
+            <div class="bottom-grid">
+
+                <!-- TOP DISPOSITIVOS -->
+
+                <div class="panel-card">
+
+                    <div class="card-header">
+
+                        <h5>
+                            <i class="fas fa-microchip"></i>
+                            Top Dispositivos
+                        </h5>
+
+                    </div>
+
+                    <div class="devices-container" id="topDevices">
+
+                    </div>
+
+                </div>
+
+                <!-- ALERTAS -->
+
+                <div class="panel-card">
+
+                    <div class="card-header">
+
+                        <h5>
+                            <i class="fas fa-bell"></i>
+                            Alertas Recientes
+                        </h5>
+
+                    </div>
+
+                    <div class="alerts-container" id="alertsContainer">
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+        <!-- ================================= -->
+        <!-- CONSUMO -->
+        <!-- ================================= -->
+
+        <section class="view hidden" id="view-consumo">
+
+            <div class="section-header">
+
+                <div>
+
+                    <span class="eyebrow">
+                        Estadísticas
+                    </span>
+
+                    <h3>
+                        Análisis de Consumo
+                    </h3>
+
+                </div>
+
+            </div>
+
+            <div class="full-chart-card">
+
+                <canvas id="trendChart"></canvas>
+
+            </div>
+
+        </section>
+
+        <!-- ================================= -->
+        <!-- ALERTAS -->
+        <!-- ================================= -->
+
+        <section class="view hidden" id="view-alertas">
+
+            <div class="section-header">
+
+                <div>
+
+                    <span class="eyebrow danger">
+                        Sistema de Alertas
+                    </span>
+
+                    <h3>
+                        Eventos Críticos
+                    </h3>
+
+                </div>
+
+            </div>
+
+            <div class="alerts-grid" id="alertsGrid">
+
+            </div>
+
+        </section>
+
+        <!-- ================================= -->
+        <!-- DISPOSITIVOS -->
+        <!-- ================================= -->
+
+        <section class="view hidden" id="view-dispositivos">
+
+            <div class="section-header">
+
+                <div>
+
+                    <span class="eyebrow">
+                        Infraestructura
+                    </span>
+
+                    <h3>
+                        Dispositivos IoT
+                    </h3>
+
+                </div>
+
+            </div>
+
+            <div class="table-card">
+
+                <table class="modern-table">
+
+                    <thead>
+
+                        <tr>
+
+                            <th>#</th>
+                            <th>Dispositivo</th>
+                            <th>Zona</th>
+                            <th>Estado</th>
+                            <th>Consumo</th>
+                            <th>Último Evento</th>
+
+                        </tr>
+
+                    </thead>
+
+                    <tbody id="devicesTableBody">
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </section>
+
+        <!-- ================================= -->
+        <!-- ZONAS -->
+        <!-- ================================= -->
+
+        <section class="view hidden" id="view-zonas">
+
+            <div class="section-header">
+
+                <div>
+
+                    <span class="eyebrow">
+                        Mapa Energético
+                    </span>
+
+                    <h3>
+                        Distribución por Zonas
+                    </h3>
+
+                </div>
+
+            </div>
+
+            <div class="zones-grid">
+
+                <div class="zone-card">
+                    <h4>CENTRO</h4>
+                    <p id="zonaCentro">0 kWh</p>
+                </div>
+
+                <div class="zone-card">
+                    <h4>SUR</h4>
+                    <p id="zonaSur">0 kWh</p>
+                </div>
+
+                <div class="zone-card">
+                    <h4>NORTE</h4>
+                    <p id="zonaNorte">0 kWh</p>
+                </div>
+
+                <div class="zone-card">
+                    <h4>EL ALTO</h4>
+                    <p id="zonaAlto">0 kWh</p>
+                </div>
+
+            </div>
+
+        </section>
+
+        <!-- ================================= -->
+        <!-- RECOMENDACIONES -->
+        <!-- ================================= -->
+
+        <section class="view hidden" id="view-recomendaciones">
+
+            <div class="section-header">
+
+                <div>
+
+                    <span class="eyebrow success">
+                        Inteligencia del Sistema
+                    </span>
+
+                    <h3>
+                        Recomendaciones Automáticas
+                    </h3>
+
+                </div>
+
+            </div>
+
+            <div class="recommendations-grid" id="recommendationsGrid">
+
+            </div>
+
+        </section>
+
+        <!-- ================================= -->
+        <!-- HISTORICO -->
+        <!-- ================================= -->
+
+        <section class="view hidden" id="view-historico">
+
+            <div class="section-header">
+
+                <div>
+
+                    <span class="eyebrow">
+                        Historial
+                    </span>
+
+                    <h3>
+                        Eventos Registrados
+                    </h3>
+
+                </div>
+
+            </div>
+
+            <div class="table-card">
+
+                <table class="modern-table">
+
+                    <thead>
+
+                        <tr>
+
+                            <th>#</th>
+                            <th>Dispositivo</th>
+                            <th>Zona</th>
+                            <th>Consumo</th>
+                            <th>Severidad</th>
+                            <th>Fecha</th>
+
+                        </tr>
+
+                    </thead>
+
+                    <tbody id="historyTable">
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </section>
+
+        <!-- ================================= -->
+        <!-- INFRAESTRUCTURA -->
+        <!-- ================================= -->
+
+        <section class="view hidden" id="view-infraestructura">
+
+            <div class="section-header">
+
+                <div>
+
+                    <span class="eyebrow">
+                        Arquitectura Distribuida
+                    </span>
+
+                    <h3>
+                        Estado de Servicios
+                    </h3>
+
+                </div>
+
+            </div>
+
+            <div class="infra-grid">
+
+                <div class="infra-card">
+
+                    <i class="fas fa-database"></i>
+
+                    <h4>Cassandra</h4>
+
+                    <p id="cassandraStatus">
+                        Conectado
+                    </p>
+
+                </div>
+
+                <div class="infra-card">
+
+                    <i class="fas fa-stream"></i>
+
+                    <h4>Redis Streams</h4>
+
+                    <p id="redisStatus">
+                        Activo
+                    </p>
+
+                </div>
+
+                <div class="infra-card">
+
+                    <i class="fas fa-server"></i>
+
+                    <h4>Worker</h4>
+
+                    <p id="workerStatus">
+                        Procesando
+                    </p>
+
+                </div>
+
+                <div class="infra-card">
+
+                    <i class="fas fa-cloud"></i>
+
+                    <h4>Flask API</h4>
+
+                    <p id="apiStatus">
+                        Disponible
+                    </p>
+
+                </div>
+
+            </div>
+
+        </section>
+
+    </main>
+
+</div>
+
+<!-- ========================================= -->
+<!-- TOAST -->
+<!-- ========================================= -->
+
+<div class="toast-container" id="toastContainer">
+
+    <div class="toast-notification" id="mainToast">
+
+        <div class="toast-icon">
+
+            <i class="fas fa-bell"></i>
+
+        </div>
+
+        <div class="toast-content">
+
+            <strong id="toastTitle">
+                Nueva Alerta
+            </strong>
+
+            <span id="toastMessage">
+                Evento detectado
+            </span>
+
+        </div>
+
+        <button class="toast-close" id="toastClose">
+
+            <i class="fas fa-xmark"></i>
+
+        </button>
+
     </div>
 
-    <!-- Scripts -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-    <script src="{{ url_for('static', filename='js/modern-app.js') }}"></script>
+</div>
+
+<!-- ========================================= -->
+<!-- SCRIPTS -->
+<!-- ========================================= -->
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+
+<script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+
+<script src="{{ url_for('static', filename='js/modern-app.js') }}"></script>
+
 </body>
 </html>

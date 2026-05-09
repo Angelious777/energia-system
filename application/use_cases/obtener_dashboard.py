@@ -19,5 +19,6 @@ def obtener_resumen_dashboard(fecha):
         "dispositivos_activos": len(dispositivos),
         "zonas_activas": len(zonas),
         "alertas_hoy": total_alertas,
-        "consumo_total": round(consumo_total, 2)
+        "consumo_total": round(consumo_total, 2),
+        "total_consumo": round(consumo_total, 2)
     }
