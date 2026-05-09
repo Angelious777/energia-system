@@ -1,6 +1,22 @@
 from infrastructure.database.redis.redis_config import redis_client
 import json
 
+
+def guardar_cache_consumo(evento):
+
+    clave = f"consumo:dispositivo:{evento['dispositivo_id']}"
+
+    redis_client.set(
+        clave,
+        evento["consumo"]
+    )
+
+    redis_client.expire(
+        clave,
+        60
+    )
+
+
 def guardar_cache_zona(datos):
 
     zona = datos["zona"]

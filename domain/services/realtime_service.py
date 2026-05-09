@@ -2,17 +2,6 @@ from infrastructure.database.redis.redis_config import redis_client
 import json
 
 
-STREAM_NAME = "consumo_stream"
-
-
-def publicar_evento(data):
-
-    redis_client.xadd(
-        STREAM_NAME,
-        data
-    )
-
-
 def publicar_consumo_realtime(evento):
 
     evento_realtime = {
@@ -26,21 +15,6 @@ def publicar_consumo_realtime(evento):
     redis_client.publish(
         "realtime_consumo",
         json.dumps(evento_realtime)
-    )
-
-
-def guardar_cache_consumo(evento):
-
-    clave = f"consumo:dispositivo:{evento['dispositivo_id']}"
-
-    redis_client.set(
-        clave,
-        evento["consumo"]
-    )
-
-    redis_client.expire(
-        clave,
-        60
     )
 
 
@@ -61,9 +35,4 @@ def publicar_alerta(alerta):
     redis_client.publish(
         "consumo_excesivo",
         json.dumps(alerta_redis)
-    )
-
-    redis_client.xadd(
-        "alertas_stream",
-        alerta_redis
     )
