@@ -1,0 +1,498 @@
+2026-05-10 04:48:26,440 | INFO | Worker iniciado: worker-734a2e
+2026-05-10 04:49:18,196 | ERROR | Error worker principal: NOGROUP No such key 'consumo_stream' or consumer group 'grupo_consumo_energia' in XREADGROUP with GROUP option
+Traceback (most recent call last):
+  File "C:\Users\ROGER\Escritorio\energia-sytem\worker.py", line 152, in <module>
+    eventos = redis_client.xreadgroup(
+              ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\ROGER\Escritorio\energia-sytem\venv\Lib\site-packages\redis\commands\core.py", line 4531, in xreadgroup
+    response = self.execute_command("XREADGROUP", *pieces, **options)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\ROGER\Escritorio\energia-sytem\venv\Lib\site-packages\redis\client.py", line 716, in execute_command
+    return self._execute_command(*args, **options)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\ROGER\Escritorio\energia-sytem\venv\Lib\site-packages\redis\client.py", line 736, in _execute_command
+    result = conn.retry.call_with_retry(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\ROGER\Escritorio\energia-sytem\venv\Lib\site-packages\redis\retry.py", line 120, in call_with_retry
+    return do()
+           ^^^^
+  File "C:\Users\ROGER\Escritorio\energia-sytem\venv\Lib\site-packages\redis\client.py", line 737, in <lambda>
+    lambda: self._send_command_parse_response(
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\ROGER\Escritorio\energia-sytem\venv\Lib\site-packages\redis\client.py", line 682, in _send_command_parse_response
+    return self.parse_response(conn, command_name, **options)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\ROGER\Escritorio\energia-sytem\venv\Lib\site-packages\redis\client.py", line 780, in parse_response
+    response = connection.read_response()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\ROGER\Escritorio\energia-sytem\venv\Lib\site-packages\redis\connection.py", line 1364, in read_response
+    raise response
+redis.exceptions.ResponseError: NOGROUP No such key 'consumo_stream' or consumer group 'grupo_consumo_energia' in XREADGROUP with GROUP option
+2026-05-10 04:49:20,224 | ERROR | Error recuperando pendientes: NOGROUP No such key 'consumo_stream' or consumer group 'grupo_consumo_energia'
+Traceback (most recent call last):
+  File "C:\Users\ROGER\Escritorio\energia-sytem\worker.py", line 89, in recuperar_pendientes
+    pendientes = redis_client.xpending_range(
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\ROGER\Escritorio\energia-sytem\venv\Lib\site-packages\redis\commands\core.py", line 4387, in xpending_range
+    return self.execute_command("XPENDING", *pieces, parse_detail=True)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\ROGER\Escritorio\energia-sytem\venv\Lib\site-packages\redis\client.py", line 716, in execute_command
+    return self._execute_command(*args, **options)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\ROGER\Escritorio\energia-sytem\venv\Lib\site-packages\redis\client.py", line 736, in _execute_command
+    result = conn.retry.call_with_retry(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\ROGER\Escritorio\energia-sytem\venv\Lib\site-packages\redis\retry.py", line 120, in call_with_retry
+    return do()
+           ^^^^
+  File "C:\Users\ROGER\Escritorio\energia-sytem\venv\Lib\site-packages\redis\client.py", line 737, in <lambda>
+    lambda: self._send_command_parse_response(
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\ROGER\Escritorio\energia-sytem\venv\Lib\site-packages\redis\client.py", line 682, in _send_command_parse_response
+    return self.parse_response(conn, command_name, **options)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\ROGER\Escritorio\energia-sytem\venv\Lib\site-packages\redis\client.py", line 780, in parse_response
+    response = connection.read_response()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\ROGER\Escritorio\energia-sytem\venv\Lib\site-packages\redis\connection.py", line 1364, in read_response
+    raise response
+redis.exceptions.ResponseError: NOGROUP No such key 'consumo_stream' or consumer group 'grupo_consumo_energia'
+2026-05-10 04:49:20,229 | ERROR | Error worker principal: NOGROUP No such key 'consumo_stream' or consumer group 'grupo_consumo_energia' in XREADGROUP with GROUP option
+Traceback (most recent call last):
+  File "C:\Users\ROGER\Escritorio\energia-sytem\worker.py", line 152, in <module>
+    eventos = redis_client.xreadgroup(
+              ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\ROGER\Escritorio\energia-sytem\venv\Lib\site-packages\redis\commands\core.py", line 4531, in xreadgroup
+    response = self.execute_command("XREADGROUP", *pieces, **options)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\ROGER\Escritorio\energia-sytem\venv\Lib\site-packages\redis\client.py", line 716, in execute_command
+    return self._execute_command(*args, **options)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\ROGER\Escritorio\energia-sytem\venv\Lib\site-packages\redis\client.py", line 736, in _execute_command
+    result = conn.retry.call_with_retry(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\ROGER\Escritorio\energia-sytem\venv\Lib\site-packages\redis\retry.py", line 120, in call_with_retry
+    return do()
+           ^^^^
+  File "C:\Users\ROGER\Escritorio\energia-sytem\venv\Lib\site-packages\redis\client.py", line 737, in <lambda>
+    lambda: self._send_command_parse_response(
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\ROGER\Escritorio\energia-sytem\venv\Lib\site-packages\redis\client.py", line 682, in _send_command_parse_response
+    return self.parse_response(conn, command_name, **options)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\ROGER\Escritorio\energia-sytem\venv\Lib\site-packages\redis\client.py", line 780, in parse_response
+    response = connection.read_response()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\ROGER\Escritorio\energia-sytem\venv\Lib\site-packages\redis\connection.py", line 1364, in read_response
+    raise response
+redis.exceptions.ResponseError: NOGROUP No such key 'consumo_stream' or consumer group 'grupo_consumo_energia' in XREADGROUP with GROUP option
+2026-05-10 04:49:22,273 | ERROR | Error recuperando pendientes: NOGROUP No such key 'consumo_stream' or consumer group 'grupo_consumo_energia'
+Traceback (most recent call last):
+  File "C:\Users\ROGER\Escritorio\energia-sytem\worker.py", line 89, in recuperar_pendientes
+    pendientes = redis_client.xpending_range(
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\ROGER\Escritorio\energia-sytem\venv\Lib\site-packages\redis\commands\core.py", line 4387, in xpending_range
+    return self.execute_command("XPENDING", *pieces, parse_detail=True)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\ROGER\Escritorio\energia-sytem\venv\Lib\site-packages\redis\client.py", line 716, in execute_command
+    return self._execute_command(*args, **options)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\ROGER\Escritorio\energia-sytem\venv\Lib\site-packages\redis\client.py", line 736, in _execute_command
+    result = conn.retry.call_with_retry(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\ROGER\Escritorio\energia-sytem\venv\Lib\site-packages\redis\retry.py", line 120, in call_with_retry
+    return do()
+           ^^^^
+  File "C:\Users\ROGER\Escritorio\energia-sytem\venv\Lib\site-packages\redis\client.py", line 737, in <lambda>
+    lambda: self._send_command_parse_response(
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\ROGER\Escritorio\energia-sytem\venv\Lib\site-packages\redis\client.py", line 682, in _send_command_parse_response
+    return self.parse_response(conn, command_name, **options)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\ROGER\Escritorio\energia-sytem\venv\Lib\site-packages\redis\client.py", line 780, in parse_response
+    response = connection.read_response()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\ROGER\Escritorio\energia-sytem\venv\Lib\site-packages\redis\connection.py", line 1364, in read_response
+    raise response
+redis.exceptions.ResponseError: NOGROUP No such key 'consumo_stream' or consumer group 'grupo_consumo_energia'
+2026-05-10 04:49:22,285 | ERROR | Error worker principal: NOGROUP No such key 'consumo_stream' or consumer group 'grupo_consumo_energia' in XREADGROUP with GROUP option
+Traceback (most recent call last):
+  File "C:\Users\ROGER\Escritorio\energia-sytem\worker.py", line 152, in <module>
+    eventos = redis_client.xreadgroup(
+              ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\ROGER\Escritorio\energia-sytem\venv\Lib\site-packages\redis\commands\core.py", line 4531, in xreadgroup
+    response = self.execute_command("XREADGROUP", *pieces, **options)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\ROGER\Escritorio\energia-sytem\venv\Lib\site-packages\redis\client.py", line 716, in execute_command
+    return self._execute_command(*args, **options)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\ROGER\Escritorio\energia-sytem\venv\Lib\site-packages\redis\client.py", line 736, in _execute_command
+    result = conn.retry.call_with_retry(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\ROGER\Escritorio\energia-sytem\venv\Lib\site-packages\redis\retry.py", line 120, in call_with_retry
+    return do()
+           ^^^^
+  File "C:\Users\ROGER\Escritorio\energia-sytem\venv\Lib\site-packages\redis\client.py", line 737, in <lambda>
+    lambda: self._send_command_parse_response(
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\ROGER\Escritorio\energia-sytem\venv\Lib\site-packages\redis\client.py", line 682, in _send_command_parse_response
+    return self.parse_response(conn, command_name, **options)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\ROGER\Escritorio\energia-sytem\venv\Lib\site-packages\redis\client.py", line 780, in parse_response
+    response = connection.read_response()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\ROGER\Escritorio\energia-sytem\venv\Lib\site-packages\redis\connection.py", line 1364, in read_response
+    raise response
+redis.exceptions.ResponseError: NOGROUP No such key 'consumo_stream' or consumer group 'grupo_consumo_energia' in XREADGROUP with GROUP option
+2026-05-10 04:49:24,298 | ERROR | Error recuperando pendientes: NOGROUP No such key 'consumo_stream' or consumer group 'grupo_consumo_energia'
+Traceback (most recent call last):
+  File "C:\Users\ROGER\Escritorio\energia-sytem\worker.py", line 89, in recuperar_pendientes
+    pendientes = redis_client.xpending_range(
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\ROGER\Escritorio\energia-sytem\venv\Lib\site-packages\redis\commands\core.py", line 4387, in xpending_range
+    return self.execute_command("XPENDING", *pieces, parse_detail=True)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\ROGER\Escritorio\energia-sytem\venv\Lib\site-packages\redis\client.py", line 716, in execute_command
+    return self._execute_command(*args, **options)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\ROGER\Escritorio\energia-sytem\venv\Lib\site-packages\redis\client.py", line 736, in _execute_command
+    result = conn.retry.call_with_retry(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\ROGER\Escritorio\energia-sytem\venv\Lib\site-packages\redis\retry.py", line 120, in call_with_retry
+    return do()
+           ^^^^
+  File "C:\Users\ROGER\Escritorio\energia-sytem\venv\Lib\site-packages\redis\client.py", line 737, in <lambda>
+    lambda: self._send_command_parse_response(
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\ROGER\Escritorio\energia-sytem\venv\Lib\site-packages\redis\client.py", line 682, in _send_command_parse_response
+    return self.parse_response(conn, command_name, **options)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\ROGER\Escritorio\energia-sytem\venv\Lib\site-packages\redis\client.py", line 780, in parse_response
+    response = connection.read_response()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\ROGER\Escritorio\energia-sytem\venv\Lib\site-packages\redis\connection.py", line 1364, in read_response
+    raise response
+redis.exceptions.ResponseError: NOGROUP No such key 'consumo_stream' or consumer group 'grupo_consumo_energia'
+2026-05-10 04:49:24,301 | ERROR | Error worker principal: NOGROUP No such key 'consumo_stream' or consumer group 'grupo_consumo_energia' in XREADGROUP with GROUP option
+Traceback (most recent call last):
+  File "C:\Users\ROGER\Escritorio\energia-sytem\worker.py", line 152, in <module>
+    eventos = redis_client.xreadgroup(
+              ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\ROGER\Escritorio\energia-sytem\venv\Lib\site-packages\redis\commands\core.py", line 4531, in xreadgroup
+    response = self.execute_command("XREADGROUP", *pieces, **options)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\ROGER\Escritorio\energia-sytem\venv\Lib\site-packages\redis\client.py", line 716, in execute_command
+    return self._execute_command(*args, **options)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\ROGER\Escritorio\energia-sytem\venv\Lib\site-packages\redis\client.py", line 736, in _execute_command
+    result = conn.retry.call_with_retry(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\ROGER\Escritorio\energia-sytem\venv\Lib\site-packages\redis\retry.py", line 120, in call_with_retry
+    return do()
+           ^^^^
+  File "C:\Users\ROGER\Escritorio\energia-sytem\venv\Lib\site-packages\redis\client.py", line 737, in <lambda>
+    lambda: self._send_command_parse_response(
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\ROGER\Escritorio\energia-sytem\venv\Lib\site-packages\redis\client.py", line 682, in _send_command_parse_response
+    return self.parse_response(conn, command_name, **options)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\ROGER\Escritorio\energia-sytem\venv\Lib\site-packages\redis\client.py", line 780, in parse_response
+    response = connection.read_response()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\ROGER\Escritorio\energia-sytem\venv\Lib\site-packages\redis\connection.py", line 1364, in read_response
+    raise response
+redis.exceptions.ResponseError: NOGROUP No such key 'consumo_stream' or consumer group 'grupo_consumo_energia' in XREADGROUP with GROUP option
+2026-05-10 04:49:26,306 | ERROR | Error recuperando pendientes: NOGROUP No such key 'consumo_stream' or consumer group 'grupo_consumo_energia'
+Traceback (most recent call last):
+  File "C:\Users\ROGER\Escritorio\energia-sytem\worker.py", line 89, in recuperar_pendientes
+    pendientes = redis_client.xpending_range(
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\ROGER\Escritorio\energia-sytem\venv\Lib\site-packages\redis\commands\core.py", line 4387, in xpending_range
+    return self.execute_command("XPENDING", *pieces, parse_detail=True)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\ROGER\Escritorio\energia-sytem\venv\Lib\site-packages\redis\client.py", line 716, in execute_command
+    return self._execute_command(*args, **options)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\ROGER\Escritorio\energia-sytem\venv\Lib\site-packages\redis\client.py", line 736, in _execute_command
+    result = conn.retry.call_with_retry(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\ROGER\Escritorio\energia-sytem\venv\Lib\site-packages\redis\retry.py", line 120, in call_with_retry
+    return do()
+           ^^^^
+  File "C:\Users\ROGER\Escritorio\energia-sytem\venv\Lib\site-packages\redis\client.py", line 737, in <lambda>
+    lambda: self._send_command_parse_response(
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\ROGER\Escritorio\energia-sytem\venv\Lib\site-packages\redis\client.py", line 682, in _send_command_parse_response
+    return self.parse_response(conn, command_name, **options)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\ROGER\Escritorio\energia-sytem\venv\Lib\site-packages\redis\client.py", line 780, in parse_response
+    response = connection.read_response()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\ROGER\Escritorio\energia-sytem\venv\Lib\site-packages\redis\connection.py", line 1364, in read_response
+    raise response
+redis.exceptions.ResponseError: NOGROUP No such key 'consumo_stream' or consumer group 'grupo_consumo_energia'
+2026-05-10 04:49:26,311 | ERROR | Error worker principal: NOGROUP No such key 'consumo_stream' or consumer group 'grupo_consumo_energia' in XREADGROUP with GROUP option
+Traceback (most recent call last):
+  File "C:\Users\ROGER\Escritorio\energia-sytem\worker.py", line 152, in <module>
+    eventos = redis_client.xreadgroup(
+              ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\ROGER\Escritorio\energia-sytem\venv\Lib\site-packages\redis\commands\core.py", line 4531, in xreadgroup
+    response = self.execute_command("XREADGROUP", *pieces, **options)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\ROGER\Escritorio\energia-sytem\venv\Lib\site-packages\redis\client.py", line 716, in execute_command
+    return self._execute_command(*args, **options)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\ROGER\Escritorio\energia-sytem\venv\Lib\site-packages\redis\client.py", line 736, in _execute_command
+    result = conn.retry.call_with_retry(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\ROGER\Escritorio\energia-sytem\venv\Lib\site-packages\redis\retry.py", line 120, in call_with_retry
+    return do()
+           ^^^^
+  File "C:\Users\ROGER\Escritorio\energia-sytem\venv\Lib\site-packages\redis\client.py", line 737, in <lambda>
+    lambda: self._send_command_parse_response(
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\ROGER\Escritorio\energia-sytem\venv\Lib\site-packages\redis\client.py", line 682, in _send_command_parse_response
+    return self.parse_response(conn, command_name, **options)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\ROGER\Escritorio\energia-sytem\venv\Lib\site-packages\redis\client.py", line 780, in parse_response
+    response = connection.read_response()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\ROGER\Escritorio\energia-sytem\venv\Lib\site-packages\redis\connection.py", line 1364, in read_response
+    raise response
+redis.exceptions.ResponseError: NOGROUP No such key 'consumo_stream' or consumer group 'grupo_consumo_energia' in XREADGROUP with GROUP option
+2026-05-10 04:49:28,315 | ERROR | Error recuperando pendientes: NOGROUP No such key 'consumo_stream' or consumer group 'grupo_consumo_energia'
+Traceback (most recent call last):
+  File "C:\Users\ROGER\Escritorio\energia-sytem\worker.py", line 89, in recuperar_pendientes
+    pendientes = redis_client.xpending_range(
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\ROGER\Escritorio\energia-sytem\venv\Lib\site-packages\redis\commands\core.py", line 4387, in xpending_range
+    return self.execute_command("XPENDING", *pieces, parse_detail=True)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\ROGER\Escritorio\energia-sytem\venv\Lib\site-packages\redis\client.py", line 716, in execute_command
+    return self._execute_command(*args, **options)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\ROGER\Escritorio\energia-sytem\venv\Lib\site-packages\redis\client.py", line 736, in _execute_command
+    result = conn.retry.call_with_retry(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\ROGER\Escritorio\energia-sytem\venv\Lib\site-packages\redis\retry.py", line 120, in call_with_retry
+    return do()
+           ^^^^
+  File "C:\Users\ROGER\Escritorio\energia-sytem\venv\Lib\site-packages\redis\client.py", line 737, in <lambda>
+    lambda: self._send_command_parse_response(
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\ROGER\Escritorio\energia-sytem\venv\Lib\site-packages\redis\client.py", line 682, in _send_command_parse_response
+    return self.parse_response(conn, command_name, **options)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\ROGER\Escritorio\energia-sytem\venv\Lib\site-packages\redis\client.py", line 780, in parse_response
+    response = connection.read_response()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\ROGER\Escritorio\energia-sytem\venv\Lib\site-packages\redis\connection.py", line 1364, in read_response
+    raise response
+redis.exceptions.ResponseError: NOGROUP No such key 'consumo_stream' or consumer group 'grupo_consumo_energia'
+2026-05-10 04:49:28,316 | ERROR | Error worker principal: NOGROUP No such key 'consumo_stream' or consumer group 'grupo_consumo_energia' in XREADGROUP with GROUP option
+Traceback (most recent call last):
+  File "C:\Users\ROGER\Escritorio\energia-sytem\worker.py", line 152, in <module>
+    eventos = redis_client.xreadgroup(
+              ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\ROGER\Escritorio\energia-sytem\venv\Lib\site-packages\redis\commands\core.py", line 4531, in xreadgroup
+    response = self.execute_command("XREADGROUP", *pieces, **options)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\ROGER\Escritorio\energia-sytem\venv\Lib\site-packages\redis\client.py", line 716, in execute_command
+    return self._execute_command(*args, **options)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\ROGER\Escritorio\energia-sytem\venv\Lib\site-packages\redis\client.py", line 736, in _execute_command
+    result = conn.retry.call_with_retry(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\ROGER\Escritorio\energia-sytem\venv\Lib\site-packages\redis\retry.py", line 120, in call_with_retry
+    return do()
+           ^^^^
+  File "C:\Users\ROGER\Escritorio\energia-sytem\venv\Lib\site-packages\redis\client.py", line 737, in <lambda>
+    lambda: self._send_command_parse_response(
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\ROGER\Escritorio\energia-sytem\venv\Lib\site-packages\redis\client.py", line 682, in _send_command_parse_response
+    return self.parse_response(conn, command_name, **options)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\ROGER\Escritorio\energia-sytem\venv\Lib\site-packages\redis\client.py", line 780, in parse_response
+    response = connection.read_response()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\ROGER\Escritorio\energia-sytem\venv\Lib\site-packages\redis\connection.py", line 1364, in read_response
+    raise response
+redis.exceptions.ResponseError: NOGROUP No such key 'consumo_stream' or consumer group 'grupo_consumo_energia' in XREADGROUP with GROUP option
+2026-05-10 04:49:30,322 | ERROR | Error recuperando pendientes: NOGROUP No such key 'consumo_stream' or consumer group 'grupo_consumo_energia'
+Traceback (most recent call last):
+  File "C:\Users\ROGER\Escritorio\energia-sytem\worker.py", line 89, in recuperar_pendientes
+    pendientes = redis_client.xpending_range(
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\ROGER\Escritorio\energia-sytem\venv\Lib\site-packages\redis\commands\core.py", line 4387, in xpending_range
+    return self.execute_command("XPENDING", *pieces, parse_detail=True)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\ROGER\Escritorio\energia-sytem\venv\Lib\site-packages\redis\client.py", line 716, in execute_command
+    return self._execute_command(*args, **options)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\ROGER\Escritorio\energia-sytem\venv\Lib\site-packages\redis\client.py", line 736, in _execute_command
+    result = conn.retry.call_with_retry(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\ROGER\Escritorio\energia-sytem\venv\Lib\site-packages\redis\retry.py", line 120, in call_with_retry
+    return do()
+           ^^^^
+  File "C:\Users\ROGER\Escritorio\energia-sytem\venv\Lib\site-packages\redis\client.py", line 737, in <lambda>
+    lambda: self._send_command_parse_response(
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\ROGER\Escritorio\energia-sytem\venv\Lib\site-packages\redis\client.py", line 682, in _send_command_parse_response
+    return self.parse_response(conn, command_name, **options)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\ROGER\Escritorio\energia-sytem\venv\Lib\site-packages\redis\client.py", line 780, in parse_response
+    response = connection.read_response()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\ROGER\Escritorio\energia-sytem\venv\Lib\site-packages\redis\connection.py", line 1364, in read_response
+    raise response
+redis.exceptions.ResponseError: NOGROUP No such key 'consumo_stream' or consumer group 'grupo_consumo_energia'
+2026-05-10 04:49:30,324 | ERROR | Error worker principal: NOGROUP No such key 'consumo_stream' or consumer group 'grupo_consumo_energia' in XREADGROUP with GROUP option
+Traceback (most recent call last):
+  File "C:\Users\ROGER\Escritorio\energia-sytem\worker.py", line 152, in <module>
+    eventos = redis_client.xreadgroup(
+              ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\ROGER\Escritorio\energia-sytem\venv\Lib\site-packages\redis\commands\core.py", line 4531, in xreadgroup
+    response = self.execute_command("XREADGROUP", *pieces, **options)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\ROGER\Escritorio\energia-sytem\venv\Lib\site-packages\redis\client.py", line 716, in execute_command
+    return self._execute_command(*args, **options)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\ROGER\Escritorio\energia-sytem\venv\Lib\site-packages\redis\client.py", line 736, in _execute_command
+    result = conn.retry.call_with_retry(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\ROGER\Escritorio\energia-sytem\venv\Lib\site-packages\redis\retry.py", line 120, in call_with_retry
+    return do()
+           ^^^^
+  File "C:\Users\ROGER\Escritorio\energia-sytem\venv\Lib\site-packages\redis\client.py", line 737, in <lambda>
+    lambda: self._send_command_parse_response(
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\ROGER\Escritorio\energia-sytem\venv\Lib\site-packages\redis\client.py", line 682, in _send_command_parse_response
+    return self.parse_response(conn, command_name, **options)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\ROGER\Escritorio\energia-sytem\venv\Lib\site-packages\redis\client.py", line 780, in parse_response
+    response = connection.read_response()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\ROGER\Escritorio\energia-sytem\venv\Lib\site-packages\redis\connection.py", line 1364, in read_response
+    raise response
+redis.exceptions.ResponseError: NOGROUP No such key 'consumo_stream' or consumer group 'grupo_consumo_energia' in XREADGROUP with GROUP option
+2026-05-10 04:49:32,326 | ERROR | Error recuperando pendientes: NOGROUP No such key 'consumo_stream' or consumer group 'grupo_consumo_energia'
+Traceback (most recent call last):
+  File "C:\Users\ROGER\Escritorio\energia-sytem\worker.py", line 89, in recuperar_pendientes
+    pendientes = redis_client.xpending_range(
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\ROGER\Escritorio\energia-sytem\venv\Lib\site-packages\redis\commands\core.py", line 4387, in xpending_range
+    return self.execute_command("XPENDING", *pieces, parse_detail=True)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\ROGER\Escritorio\energia-sytem\venv\Lib\site-packages\redis\client.py", line 716, in execute_command
+    return self._execute_command(*args, **options)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\ROGER\Escritorio\energia-sytem\venv\Lib\site-packages\redis\client.py", line 736, in _execute_command
+    result = conn.retry.call_with_retry(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\ROGER\Escritorio\energia-sytem\venv\Lib\site-packages\redis\retry.py", line 120, in call_with_retry
+    return do()
+           ^^^^
+  File "C:\Users\ROGER\Escritorio\energia-sytem\venv\Lib\site-packages\redis\client.py", line 737, in <lambda>
+    lambda: self._send_command_parse_response(
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\ROGER\Escritorio\energia-sytem\venv\Lib\site-packages\redis\client.py", line 682, in _send_command_parse_response
+    return self.parse_response(conn, command_name, **options)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\ROGER\Escritorio\energia-sytem\venv\Lib\site-packages\redis\client.py", line 780, in parse_response
+    response = connection.read_response()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\ROGER\Escritorio\energia-sytem\venv\Lib\site-packages\redis\connection.py", line 1364, in read_response
+    raise response
+redis.exceptions.ResponseError: NOGROUP No such key 'consumo_stream' or consumer group 'grupo_consumo_energia'
+2026-05-10 04:49:32,331 | ERROR | Error worker principal: NOGROUP No such key 'consumo_stream' or consumer group 'grupo_consumo_energia' in XREADGROUP with GROUP option
+Traceback (most recent call last):
+  File "C:\Users\ROGER\Escritorio\energia-sytem\worker.py", line 152, in <module>
+    eventos = redis_client.xreadgroup(
+              ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\ROGER\Escritorio\energia-sytem\venv\Lib\site-packages\redis\commands\core.py", line 4531, in xreadgroup
+    response = self.execute_command("XREADGROUP", *pieces, **options)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\ROGER\Escritorio\energia-sytem\venv\Lib\site-packages\redis\client.py", line 716, in execute_command
+    return self._execute_command(*args, **options)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\ROGER\Escritorio\energia-sytem\venv\Lib\site-packages\redis\client.py", line 736, in _execute_command
+    result = conn.retry.call_with_retry(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\ROGER\Escritorio\energia-sytem\venv\Lib\site-packages\redis\retry.py", line 120, in call_with_retry
+    return do()
+           ^^^^
+  File "C:\Users\ROGER\Escritorio\energia-sytem\venv\Lib\site-packages\redis\client.py", line 737, in <lambda>
+    lambda: self._send_command_parse_response(
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\ROGER\Escritorio\energia-sytem\venv\Lib\site-packages\redis\client.py", line 682, in _send_command_parse_response
+    return self.parse_response(conn, command_name, **options)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\ROGER\Escritorio\energia-sytem\venv\Lib\site-packages\redis\client.py", line 780, in parse_response
+    response = connection.read_response()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\ROGER\Escritorio\energia-sytem\venv\Lib\site-packages\redis\connection.py", line 1364, in read_response
+    raise response
+redis.exceptions.ResponseError: NOGROUP No such key 'consumo_stream' or consumer group 'grupo_consumo_energia' in XREADGROUP with GROUP option
+2026-05-10 04:49:34,335 | ERROR | Error recuperando pendientes: NOGROUP No such key 'consumo_stream' or consumer group 'grupo_consumo_energia'
+Traceback (most recent call last):
+  File "C:\Users\ROGER\Escritorio\energia-sytem\worker.py", line 89, in recuperar_pendientes
+    pendientes = redis_client.xpending_range(
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\ROGER\Escritorio\energia-sytem\venv\Lib\site-packages\redis\commands\core.py", line 4387, in xpending_range
+    return self.execute_command("XPENDING", *pieces, parse_detail=True)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\ROGER\Escritorio\energia-sytem\venv\Lib\site-packages\redis\client.py", line 716, in execute_command
+    return self._execute_command(*args, **options)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\ROGER\Escritorio\energia-sytem\venv\Lib\site-packages\redis\client.py", line 736, in _execute_command
+    result = conn.retry.call_with_retry(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\ROGER\Escritorio\energia-sytem\venv\Lib\site-packages\redis\retry.py", line 120, in call_with_retry
+    return do()
+           ^^^^
+  File "C:\Users\ROGER\Escritorio\energia-sytem\venv\Lib\site-packages\redis\client.py", line 737, in <lambda>
+    lambda: self._send_command_parse_response(
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\ROGER\Escritorio\energia-sytem\venv\Lib\site-packages\redis\client.py", line 682, in _send_command_parse_response
+    return self.parse_response(conn, command_name, **options)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\ROGER\Escritorio\energia-sytem\venv\Lib\site-packages\redis\client.py", line 780, in parse_response
+    response = connection.read_response()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\ROGER\Escritorio\energia-sytem\venv\Lib\site-packages\redis\connection.py", line 1364, in read_response
+    raise response
+redis.exceptions.ResponseError: NOGROUP No such key 'consumo_stream' or consumer group 'grupo_consumo_energia'
+2026-05-10 04:49:34,337 | ERROR | Error worker principal: NOGROUP No such key 'consumo_stream' or consumer group 'grupo_consumo_energia' in XREADGROUP with GROUP option
+Traceback (most recent call last):
+  File "C:\Users\ROGER\Escritorio\energia-sytem\worker.py", line 152, in <module>
+    eventos = redis_client.xreadgroup(
+              ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\ROGER\Escritorio\energia-sytem\venv\Lib\site-packages\redis\commands\core.py", line 4531, in xreadgroup
+    response = self.execute_command("XREADGROUP", *pieces, **options)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\ROGER\Escritorio\energia-sytem\venv\Lib\site-packages\redis\client.py", line 716, in execute_command
+    return self._execute_command(*args, **options)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\ROGER\Escritorio\energia-sytem\venv\Lib\site-packages\redis\client.py", line 736, in _execute_command
+    result = conn.retry.call_with_retry(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\ROGER\Escritorio\energia-sytem\venv\Lib\site-packages\redis\retry.py", line 120, in call_with_retry
+    return do()
+           ^^^^
+  File "C:\Users\ROGER\Escritorio\energia-sytem\venv\Lib\site-packages\redis\client.py", line 737, in <lambda>
+    lambda: self._send_command_parse_response(
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\ROGER\Escritorio\energia-sytem\venv\Lib\site-packages\redis\client.py", line 682, in _send_command_parse_response
+    return self.parse_response(conn, command_name, **options)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\ROGER\Escritorio\energia-sytem\venv\Lib\site-packages\redis\client.py", line 780, in parse_response
+    response = connection.read_response()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\ROGER\Escritorio\energia-sytem\venv\Lib\site-packages\redis\connection.py", line 1364, in read_response
+    raise response
+redis.exceptions.ResponseError: NOGROUP No such key 'consumo_stream' or consumer group 'grupo_consumo_energia' in XREADGROUP with GROUP option
+2026-05-10 04:50:32,029 | INFO | Worker iniciado: worker-e9f2ad
+2026-05-10 04:53:18,988 | INFO | Worker iniciado: worker-ae3475
+2026-05-10 05:14:53,285 | INFO | Worker iniciado: worker-70f454
+2026-05-10 05:19:38,481 | INFO | Worker iniciado: worker-967f32
