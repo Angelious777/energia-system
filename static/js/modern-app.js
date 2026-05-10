@@ -49,6 +49,10 @@ function initializeSystem() {
 
     initializeToast();
 
+    initializeEstadisticas();
+
+    initializeAlertas();
+
     startPolling();
 
 }
@@ -993,6 +997,76 @@ function renderRecommendations(data) {
 }
 
 // ========================================
+// ESTADISTICAS
+// ========================================
+
+function renderEstadisticas(estadisticas) {
+
+    const container =
+        document.getElementById(
+            "estadisticasGrid"
+        );
+
+    if (!estadisticas || !estadisticas.length) {
+
+        container.innerHTML =
+            "<p>Sin estadísticas disponibles</p>";
+
+        return;
+
+    }
+
+    const html = estadisticas.map(estadistica => `
+
+        <div class="stat-card">
+
+            <div class="stat-header">
+
+                <h4>
+                    Zona ${estadistica.zona}
+                </h4>
+
+                <i class="fas fa-chart-bar"></i>
+
+            </div>
+
+            <div class="stat-body">
+
+                <div class="stat-metric">
+
+                    <span class="label">
+                        Consumo Total
+                    </span>
+
+                    <span class="value">
+                        ${estadistica.total_consumo.toFixed(2)} kWh
+                    </span>
+
+                </div>
+
+                <div class="stat-metric">
+
+                    <span class="label">
+                        Promedio
+                    </span>
+
+                    <span class="value">
+                        ${estadistica.promedio.toFixed(2)} kWh
+                    </span>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    `).join("");
+
+    container.innerHTML = html;
+
+}
+
+// ========================================
 // HISTORY
 // ========================================
 
@@ -1227,6 +1301,143 @@ function hideToast() {
     document
         .getElementById("mainToast")
         .classList.remove("show");
+
+}
+
+// ========================================
+// ESTADISTICAS INIT
+// ========================================
+
+function initializeEstadisticas() {
+
+    // Set default date to today
+    const today = new Date().toISOString().split("T")[0];
+    document.getElementById("estadisticasFecha").value = today;
+
+    // Add event listener for calculate button
+    document
+        .getElementById("btnCalcularEstadisticas")
+        .addEventListener("click", async () => {
+
+            const fecha = document.getElementById("estadisticasFecha").value;
+
+            if (!fecha) {
+                showToast("Error", "Selecciona una fecha");
+                return;
+            }
+
+            try {
+                const response = await fetch(`/estadisticas/zona/${fecha}`);
+                const data = await response.json();
+
+                if (data.estadisticas) {
+                    renderEstadisticas(data.estadisticas);
+                } else {
+                    renderEstadisticas([]);
+                }
+
+            } catch (error) {
+                console.error("Error cargando estadísticas:", error);
+                showToast("Error", "No se pudieron cargar las estadísticas");
+            }
+
+        });
+
+    document
+        .getElementById("btnGuardarEstadisticas")
+        .addEventListener("click", async () => {
+
+            const zona = document.getElementById("estadisticasZona").value.trim();
+            const fecha = document.getElementById("estadisticasFecha").value;
+
+            if (!zona || !fecha) {
+                showToast("Error", "Completa zona y fecha");
+                return;
+            }
+
+            try {
+                const response = await fetch(
+                    `/estadisticas/zona/${zona}/${fecha}/calcular`,
+                    {
+                        method: "POST"
+                    }
+                );
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    showToast("Éxito", "Estadística guardada en Cassandra");
+                    // Refrescar lista de estadísticas
+                    document.getElementById("btnCalcularEstadisticas").click();
+                } else {
+                    showToast("Error", data.error || "No se pudo guardar");
+                }
+
+            } catch (error) {
+                console.error("Error guardando estadística:", error);
+                showToast("Error", "No se pudo guardar la estadística");
+            }
+
+        });
+
+}
+
+function initializeAlertas() {
+
+    document
+        .getElementById("btnGuardarAlertaDispositivo")
+        .addEventListener("click", async () => {
+
+            const dispositivo_id = document.getElementById("alertaDispositivoId").value.trim();
+            const zona = document.getElementById("alertaZona").value.trim();
+            const consumo = parseFloat(document.getElementById("alertaConsumo").value.trim());
+            const severidad = document.getElementById("alertaSeveridad").value.trim().toUpperCase();
+            const mensaje = document.getElementById("alertaMensaje").value.trim();
+            const fecha = new Date().toISOString();
+
+            if (!dispositivo_id || !zona || Number.isNaN(consumo) || !severidad || !mensaje) {
+                showToast("Error", "Completa todos los campos");
+                return;
+            }
+
+            try {
+                const response = await fetch(
+                    "/alertas/dispositivo",
+                    {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify({
+                            dispositivo_id,
+                            zona,
+                            consumo,
+                            severidad,
+                            recomendacion: mensaje,
+                            timestamp: fecha
+                        })
+                    }
+                );
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    showToast("Éxito", "Alerta guardada en Cassandra");
+                    document.getElementById("alertaDispositivoId").value = "";
+                    document.getElementById("alertaZona").value = "";
+                    document.getElementById("alertaConsumo").value = "";
+                    document.getElementById("alertaSeveridad").value = "";
+                    document.getElementById("alertaMensaje").value = "";
+                } else {
+                    showToast("Error", data.error || "No se pudo guardar la alerta");
+                }
+
+            } catch (error) {
+                console.error("Error guardando alerta:", error);
+                showToast("Error", "No se pudo guardar la alerta");
+            }
+
+        });
 
 }
 

@@ -2,6 +2,7 @@ from flask import Flask, request, render_template, send_from_directory
 from flask_socketio import SocketIO
 
 from infrastructure.services.event_stream_service import publicar_evento
+from config.logging_config import logger
 
 import json
 import os
@@ -9,6 +10,8 @@ import uuid
 from threading import Thread
 
 from datetime import datetime
+
+from infrastructure.database.redis.redis_config import redis_client
 
 from infrastructure.database.cassandra.cassandra_consumo_repository import (
     CassandraConsumoRepository
@@ -44,8 +47,18 @@ from infrastructure.services.cache_service import (
     obtener_consumo_zona
 )
 
-from infrastructure.database.redis.redis_config import (
-    redis_client
+from application.use_cases.obtener_alertas_por_dispositivo import (
+    obtener_alertas_por_dispositivo
+)
+
+from application.use_cases.obtener_estadisticas_por_zona import (
+    obtener_estadisticas_por_zona,
+    calcular_estadisticas_zona,
+    obtener_estadistica_zona_individual
+)
+
+from application.use_cases.guardar_alerta_por_dispositivo import (
+    guardar_alerta_por_dispositivo
 )
 
 # =========================================
@@ -158,6 +171,7 @@ def registrar_consumo():
                 data["zona"]
         }
 
+        logger.info(f"Nuevo evento recibido en app.py /consumo: {evento}")
         publicar_evento(evento)
 
         return {
@@ -257,11 +271,11 @@ def _emit_dispositivos_realtime():
         ignore_subscribe_messages=True
     )
 
-    pubsub.subscribe('consumo:dispositivo:*')
+    pubsub.psubscribe('consumo:dispositivo:*')
 
     for mensaje in pubsub.listen():
 
-        if mensaje["type"] != "message":
+        if mensaje["type"] != "pmessage":
             continue
 
         try:
@@ -561,6 +575,82 @@ def zonas_por_fecha(
     )
 
     return resultado
+
+# =========================================
+# ALERTAS POR DISPOSITIVO
+# =========================================
+
+@app.route('/alertas/dispositivo/<dispositivo_id>/<fecha>')
+def alertas_por_dispositivo_endpoint(
+    dispositivo_id,
+    fecha
+):
+
+    try:
+        resultado = obtener_alertas_por_dispositivo(
+            dispositivo_id,
+            fecha
+        )
+        return {"alertas": resultado}
+    except ValueError as e:
+        return {"error": str(e)}, 400
+
+@app.route('/alertas/dispositivo', methods=['POST'])
+def guardar_alerta_por_dispositivo_endpoint():
+
+    try:
+        data = request.json
+        resultado = guardar_alerta_por_dispositivo(data)
+        return resultado, 201
+    except Exception as e:
+        return {"error": str(e)}, 400
+
+# =========================================
+# ESTADISTICAS POR ZONA
+# =========================================
+
+@app.route('/estadisticas/zona/<fecha>')
+def estadisticas_por_zona_endpoint(
+    fecha
+):
+
+    try:
+        resultado = obtener_estadisticas_por_zona(
+            fecha
+        )
+        return {"estadisticas": resultado}
+    except ValueError as e:
+        return {"error": str(e)}, 400
+
+@app.route('/estadisticas/zona/<zona>/<fecha>')
+def estadistica_zona_individual_endpoint(
+    zona,
+    fecha
+):
+
+    try:
+        resultado = obtener_estadistica_zona_individual(
+            zona,
+            fecha
+        )
+        return resultado if resultado else {"error": "Estadística no encontrada"}, 404
+    except ValueError as e:
+        return {"error": str(e)}, 400
+
+@app.route('/estadisticas/zona/<zona>/<fecha>/calcular', methods=['POST'])
+def calcular_estadisticas_zona_endpoint(
+    zona,
+    fecha
+):
+
+    try:
+        resultado = calcular_estadisticas_zona(
+            zona,
+            fecha
+        )
+        return resultado, 200
+    except ValueError as e:
+        return {"error": str(e)}, 400
 
 # =========================================
 # MAIN
