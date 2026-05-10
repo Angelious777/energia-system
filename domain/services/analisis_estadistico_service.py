@@ -54,13 +54,35 @@ def analizar_consumo(
         2 * desviacion
     )
 
+    umbral_relevante = promedio + (
+        1.5 * desviacion
+    )
+
+    recientes = consumos[-5:]
+
+    repeticiones = len([
+        valor for valor in recientes
+        if valor > umbral_relevante
+    ])
+
+    ratio = consumo_actual / promedio if promedio > 0 else 0
+
     hay_anomalia = (
-        consumo_actual > limite_superior
+        consumo_actual > promedio + (3 * desviacion)
+        or (
+            consumo_actual > limite_superior
+            and repeticiones >= 2
+        )
     )
 
     return {
 
         "anomalia": hay_anomalia,
+
+        "motivo": (
+            "Picos recurrentes detectados" if repeticiones >= 2
+            else "Pico aislado"
+        ),
 
         "promedio": round(
             promedio,
@@ -76,6 +98,10 @@ def analizar_consumo(
             limite_superior,
             2
         ),
+
+        "repeticiones": repeticiones,
+
+        "ratio": round(ratio, 2),
 
         "consumo_actual": consumo_actual
     }

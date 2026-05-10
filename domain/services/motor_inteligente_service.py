@@ -23,7 +23,7 @@ def motor_inteligente(datos, repository):
         }
 
     # 3. generar alerta (reglas de negocio)
-    alerta = generar_alerta(datos)
+    alerta = generar_alerta(datos, analisis)
 
     return {
         "anomalia": True,

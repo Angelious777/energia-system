@@ -9,6 +9,9 @@ class CassandraConsumoRepository(ConsumoRepository):
 
     def guardar(self, consumo: Consumo) -> None:
 
+        if session is None:
+            return
+
         query = """
         INSERT INTO consumo_por_dispositivo (
             dispositivo_id,
@@ -35,6 +38,9 @@ class CassandraConsumoRepository(ConsumoRepository):
         dispositivo_id: str,
         fecha
     ) -> List[Consumo]:
+
+        if session is None:
+            return []
 
         query = """
         SELECT *
@@ -67,6 +73,9 @@ class CassandraConsumoRepository(ConsumoRepository):
         self,
         dispositivo_id
     ):
+
+        if session is None:
+            return []
 
         query = """
         SELECT *

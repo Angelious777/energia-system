@@ -1718,6 +1718,78 @@ body {
     transform: scale(1.1);
 }
 
+.map-card {
+
+    background: rgba(255, 255, 255, 0.05);
+
+    border: 1px solid rgba(255, 255, 255, 0.08);
+
+    border-radius: 20px;
+
+    padding: 24px;
+
+    margin-top: 24px;
+
+}
+
+.map-grid {
+
+    display: grid;
+
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+
+    gap: 18px;
+
+    margin-top: 18px;
+
+}
+
+.map-zone {
+
+    background: rgba(255, 255, 255, 0.06);
+
+    border-radius: 18px;
+
+    padding: 18px;
+
+    min-height: 130px;
+
+    display: flex;
+
+    flex-direction: column;
+
+    justify-content: space-between;
+
+    border: 1px solid rgba(255, 255, 255, 0.08);
+
+}
+
+.map-zone h4 {
+
+    margin-bottom: 10px;
+
+    color: var(--text-primary);
+
+}
+
+.map-zone strong {
+
+    font-size: 1.7rem;
+
+    display: block;
+
+    margin-bottom: 8px;
+
+}
+
+.map-zone p {
+
+    color: var(--text-secondary);
+
+    font-size: 0.95rem;
+
+}
+
 /* ========================================
    LIVE INDICATOR
 ======================================== */
