@@ -2,10 +2,11 @@ from flask import Blueprint
 from flask import request
 
 import uuid
-import datetime
+from datetime import datetime
 
 from infrastructure.database.redis.redis_config import redis_client
 from infrastructure.services.event_stream_service import publicar_evento
+from config.logging_config import logger
 
 from application.dto.consumo_dto import ConsumoDTO
 
@@ -36,11 +37,10 @@ def registrar_consumo():
             "dispositivo_id":
                 data["dispositivo_id"],
 
-            "timestamp":
-                data.get(
-                    "timestamp",
-                    datetime.utcnow().isoformat()
-                ),
+            "timestamp": data.get(
+                "timestamp",
+                datetime.utcnow().isoformat()
+            ),
 
             "consumo":
                 data["consumo"],
@@ -49,6 +49,7 @@ def registrar_consumo():
                 data["zona"]
         }
 
+        logger.info(f"Nuevo evento recibido /consumo: {evento}")
         publicar_evento(evento)
 
         return {

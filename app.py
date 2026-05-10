@@ -2,6 +2,7 @@ from flask import Flask, request, render_template, send_from_directory
 from flask_socketio import SocketIO
 
 from infrastructure.services.event_stream_service import publicar_evento
+from config.logging_config import logger
 
 import json
 import os
@@ -170,6 +171,7 @@ def registrar_consumo():
                 data["zona"]
         }
 
+        logger.info(f"Nuevo evento recibido en app.py /consumo: {evento}")
         publicar_evento(evento)
 
         return {
