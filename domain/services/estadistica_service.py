@@ -1,4 +1,6 @@
 from infrastructure.database.cassandra.cassandra_alerta_repository import CassandraAlertaRepository
+from infrastructure.database.cassandra.cassandra_consumo_repository import CassandraConsumoRepository
+from infrastructure.database.redis.redis_config import redis_client
 
 def obtener_estadisticas_alertas(fecha):
     repository = CassandraAlertaRepository()
@@ -106,5 +108,50 @@ def estadisticas_zona(zona, fecha):
     }
 
     return resultado
+
+
+def top_dispositivos_por_consumo(fecha):
+    repository = CassandraConsumoRepository()
+    consumos = repository.obtener_por_fecha(fecha)
+
+    conteo = {}
+
+    for consumo in consumos:
+        dispositivo = consumo.dispositivo_id
+        if dispositivo not in conteo:
+            conteo[dispositivo] = {
+                "consumo_total": 0,
+                "zona": consumo.zona,
+                "ultimo_evento": consumo.timestamp
+            }
+        conteo[dispositivo]["consumo_total"] += consumo.consumo
+        if consumo.timestamp > conteo[dispositivo]["ultimo_evento"]:
+            conteo[dispositivo]["ultimo_evento"] = consumo.timestamp
+
+    resultado = []
+    for dispositivo, data in conteo.items():
+        # Obtener consumo actual de Redis
+        clave = f"consumo:dispositivo:{dispositivo}"
+        consumo_actual = redis_client.get(clave)
+        if consumo_actual:
+            consumo_actual = float(consumo_actual)
+        else:
+            consumo_actual = 0
+
+        resultado.append({
+            "dispositivo_id": dispositivo,
+            "zona": data["zona"],
+            "consumo_total": round(data["consumo_total"], 2),
+            "consumo_actual": round(consumo_actual, 2),
+            "ultimo_evento": data["ultimo_evento"].strftime("%H:%M:%S")
+        })
+
+    resultado.sort(key=lambda x: x["consumo_total"], reverse=True)
+
+    return resultado
+
+
+def dispositivos_iot(fecha):
+    return top_dispositivos_por_consumo(fecha)
 
 

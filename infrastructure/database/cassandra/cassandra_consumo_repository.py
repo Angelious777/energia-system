@@ -69,6 +69,33 @@ class CassandraConsumoRepository(ConsumoRepository):
 
         return consumos
     
+    def obtener_por_fecha(self, fecha) -> List[Consumo]:
+
+        if session is None:
+            return []
+
+        query = """
+        SELECT *
+        FROM consumo_por_dispositivo
+        WHERE fecha = %s
+        ALLOW FILTERING
+        """
+
+        rows = session.execute(query, (fecha,))
+
+        consumos = []
+
+        for row in rows:
+            consumo = Consumo(
+                dispositivo_id=row.dispositivo_id,
+                zona=row.zona,
+                consumo=row.consumo,
+                timestamp=row.timestamp
+            )
+            consumos.append(consumo)
+
+        return consumos
+    
     def obtener_por_dispositivo(
         self,
         dispositivo_id

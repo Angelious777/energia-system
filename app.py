@@ -1,11 +1,12 @@
 from flask import Flask, request, render_template, send_from_directory
 from flask_socketio import SocketIO
 
-from domain.services.event_stream_service import publicar_evento
+from infrastructure.services.event_stream_service import publicar_evento
 
 import json
 import os
 import uuid
+from threading import Thread
 
 from datetime import datetime
 
@@ -16,6 +17,8 @@ from infrastructure.database.cassandra.cassandra_consumo_repository import (
 from domain.services.estadistica_service import (
     obtener_estadisticas_alertas,
     top_dispositivos_alertas,
+    top_dispositivos_por_consumo,
+    dispositivos_iot,
     estadisticas_zona,
     distribucion_zonas,
     tendencia_consumo
@@ -37,7 +40,7 @@ from application.use_cases.obtener_dashboard import (
     obtener_resumen_dashboard
 )
 
-from domain.services.cache_service import (
+from infrastructure.services.cache_service import (
     obtener_consumo_zona
 )
 
@@ -247,6 +250,36 @@ def _emit_realtime_events():
                 }
             )
 
+
+def _emit_dispositivos_realtime():
+
+    pubsub = redis_client.pubsub(
+        ignore_subscribe_messages=True
+    )
+
+    pubsub.subscribe('consumo:dispositivo:*')
+
+    for mensaje in pubsub.listen():
+
+        if mensaje["type"] != "message":
+            continue
+
+        try:
+            dispositivo_id = mensaje["channel"].decode().replace("consumo:dispositivo:", "")
+            consumo_actual = float(mensaje["data"])
+            
+            # Emitir datos actualizados al frontend
+            socketio.emit(
+                'dispositivo_actualizado',
+                {
+                    "dispositivo_id": dispositivo_id,
+                    "consumo_actual": consumo_actual,
+                    "timestamp": datetime.utcnow().isoformat()
+                }
+            )
+        except Exception as e:
+            print(f"Error emitiendo dispositivo: {e}")
+
 # =========================================
 # REDIS CACHE
 # =========================================
@@ -378,7 +411,7 @@ def top_dispositivos(
     fecha
 ):
 
-    resultado = top_dispositivos_alertas(
+    resultado = top_dispositivos_por_consumo(
         fecha
     )
 
@@ -504,7 +537,7 @@ def dispositivos_por_fecha(
     fecha
 ):
 
-    resultado = top_dispositivos_alertas(
+    resultado = dispositivos_iot(
         fecha
     )
 
@@ -534,6 +567,19 @@ def zonas_por_fecha(
 # =========================================
 
 if __name__ == '__main__':
+
+    # Iniciar threads para eventos en tiempo real
+    thread_realtime = Thread(
+        target=_emit_realtime_events,
+        daemon=True
+    )
+    thread_realtime.start()
+
+    thread_dispositivos = Thread(
+        target=_emit_dispositivos_realtime,
+        daemon=True
+    )
+    thread_dispositivos.start()
 
     socketio.run(
 
