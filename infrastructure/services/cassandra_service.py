@@ -22,12 +22,22 @@ def _extract_fecha(timestamp_value):
     if isinstance(timestamp_value, datetime.datetime):
         return timestamp_value.date().isoformat()
     if isinstance(timestamp_value, str):
+        if "T" in timestamp_value:
+            return timestamp_value.split("T")[0]
         return timestamp_value.split(" ")[0]
     raise ValueError(f"Timestamp no válido: {timestamp_value}")
 
 
+def _verify_session():
+    if session is None:
+        raise RuntimeError(
+            "Cassandra no está inicializado. Verifique CASSANDRA_HOST y CASSANDRA_KEYSPACE."
+        )
+
+
 def guardar_consumo(evento):
     """Guarda el consumo en la tabla consumo_por_dispositivo"""
+    _verify_session()
     timestamp_dt = _parse_timestamp(evento["timestamp"])
     fecha = _extract_fecha(evento["timestamp"])
 
@@ -52,10 +62,12 @@ def guardar_consumo(evento):
         ))
     except Exception as e:
         print(f"Error guardando consumo en consumo_por_dispositivo: {e}")
+        raise
 
 
 def guardar_consumo_zona(evento):
     """Guarda el consumo en la tabla consumo_por_zona"""
+    _verify_session()
     timestamp_dt = _parse_timestamp(evento["timestamp"])
     fecha = _extract_fecha(evento["timestamp"])
 
@@ -80,6 +92,7 @@ def guardar_consumo_zona(evento):
         ))
     except Exception as e:
         print(f"Error guardando consumo en consumo_por_zona: {e}")
+        raise
 
 
 def obtener_historial(dispositivo_id, fecha):
@@ -112,6 +125,7 @@ def obtener_historial(dispositivo_id, fecha):
 
 
 def guardar_alerta(alerta):
+    _verify_session()
 
     query = """
     INSERT INTO alertas (
@@ -127,13 +141,17 @@ def guardar_alerta(alerta):
     VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
     """
 
-    session.execute(query, (
-        alerta["fecha"],
-        alerta["timestamp"],
-        alerta["alerta_id"],
-        alerta["dispositivo_id"],
-        alerta["zona"],
-        alerta["consumo"],
-        alerta["severidad"],
-        alerta["recomendacion"]
-    ))
+    try:
+        session.execute(query, (
+            alerta["fecha"],
+            alerta["timestamp"],
+            alerta["alerta_id"],
+            alerta["dispositivo_id"],
+            alerta["zona"],
+            alerta["consumo"],
+            alerta["severidad"],
+            alerta["recomendacion"]
+        ))
+    except Exception as e:
+        print(f"Error guardando alerta en alertas: {e}")
+        raise

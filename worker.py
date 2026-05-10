@@ -2,6 +2,8 @@ import time
 import datetime
 import uuid
 
+import redis
+
 from infrastructure.database.redis.redis_config import redis_client
 
 from infrastructure.database.cassandra.cassandra_consumo_repository import (
@@ -65,10 +67,31 @@ def _ensure_stream_group():
             id='0',
             mkstream=True
         )
+    except redis.exceptions.ResponseError as e:
+        error_message = str(e)
+
+        if 'BUSYGROUP' in error_message:
+            return
+
+        if 'NOGROUP' in error_message:
+            # El stream existe pero el grupo no; intentamos crear el grupo nuevamente.
+            redis_client.xgroup_create(
+                STREAM_NAME,
+                GROUP_NAME,
+                id='0'
+            )
+            return
+
+        logger.error(f"Error creando consumer group: {e}", exc_info=True)
+        raise
+
+
+def ensure_stream_group():
+    try:
+        _ensure_stream_group()
     except Exception as e:
-        if 'BUSYGROUP' not in str(e):
-            logger.error(f"Error creando consumer group: {e}", exc_info=True)
-            raise
+        logger.error(f"No se pudo asegurar el consumer group: {e}", exc_info=True)
+        raise
 
 
 # =========================================
@@ -84,6 +107,8 @@ def procesar_evento(datos):
 # =========================================
 
 def recuperar_pendientes():
+
+    ensure_stream_group()
 
     try:
         pendientes = redis_client.xpending_range(
@@ -149,6 +174,8 @@ while True:
 
         recuperar_pendientes()
 
+        ensure_stream_group()
+
         eventos = redis_client.xreadgroup(
             GROUP_NAME,
             CONSUMER_NAME,
@@ -181,6 +208,22 @@ while True:
                 else:
                     logger.warning(f"NO procesado: {mensaje_id}")
 
+    except redis.exceptions.ResponseError as e:
+        error_message = str(e)
+
+        if 'NOGROUP' in error_message:
+            logger.warning(
+                "Grupo de consumidor faltante; recreando y reintentando en el siguiente ciclo."
+            )
+            ensure_stream_group()
+            time.sleep(1)
+            continue
+
+        logger.error(f"Error worker principal: {e}", exc_info=True)
+        time.sleep(2)
+    except KeyboardInterrupt:
+        logger.info("Worker detenido por interrupción del usuario.")
+        break
     except Exception as e:
         logger.error(f"Error worker principal: {e}", exc_info=True)
         time.sleep(2)

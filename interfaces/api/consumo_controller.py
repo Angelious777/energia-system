@@ -2,9 +2,11 @@ from flask import Blueprint
 from flask import request
 
 import uuid
-import datetime
+from datetime import datetime
 
 from infrastructure.database.redis.redis_config import redis_client
+from infrastructure.services.event_stream_service import publicar_evento
+from config.logging_config import logger
 
 from application.dto.consumo_dto import ConsumoDTO
 
@@ -25,51 +27,46 @@ def registrar_consumo():
 
     data = request.json
 
-    dto = ConsumoDTO(
+    try:
 
-        dispositivo_id=data[
-            "dispositivo_id"
-        ],
+        evento = {
 
-        zona=data[
-            "zona"
-        ],
+            "event_id":
+                str(uuid.uuid4()),
 
-        consumo=data[
-            "consumo"
-        ]
-    )
+            "dispositivo_id":
+                data["dispositivo_id"],
 
-    evento = {
+            "timestamp": data.get(
+                "timestamp",
+                datetime.utcnow().isoformat()
+            ),
 
-        "event_id": str(
-            uuid.uuid4()
-        ),
+            "consumo":
+                data["consumo"],
 
-        "dispositivo_id":
-            dto.dispositivo_id,
+            "zona":
+                data["zona"]
+        }
 
-        "zona":
-            dto.zona,
+        logger.info(f"Nuevo evento recibido /consumo: {evento}")
+        publicar_evento(evento)
 
-        "consumo":
-            str(dto.consumo),
+        return {
 
-        "timestamp": str(
-            datetime.datetime.now()
-        )
-    }
+            "mensaje":
+                "Evento enviado correctamente",
 
-    redis_client.xadd(
-        STREAM_NAME,
-        evento
-    )
+            "event_id":
+                evento["event_id"]
 
-    return {
+        }, 201
 
-        "mensaje":
-            "Evento enviado al stream",
+    except Exception as e:
 
-        "evento":
-            evento
-    }
+        return {
+
+            "error":
+                str(e)
+
+        }, 400

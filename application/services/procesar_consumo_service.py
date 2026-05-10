@@ -1,26 +1,26 @@
-from domain.services.metricas_service import (
+from infrastructure.services.metricas_service import (
     incrementar_consumo_zona,
     incrementar_dispositivo,
     incrementar_alerta
 )
 
-from domain.services.idempotencia_service import (
+from infrastructure.services.idempotencia_service import (
     evento_ya_procesado,
     marcar_evento_procesado
 )
 
-from domain.services.cassandra_service import (
+from infrastructure.services.cassandra_service import (
     guardar_alerta,
     guardar_consumo,
     guardar_consumo_zona
 )
 
-from domain.services.realtime_service import (
+from infrastructure.services.realtime_service import (
     publicar_alerta,
     publicar_consumo_realtime
 )
 
-from domain.services.cache_service import (
+from infrastructure.services.cache_service import (
     guardar_cache_consumo,
     guardar_cache_zona
 )

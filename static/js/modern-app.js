@@ -16,7 +16,9 @@ const state = {
 
     lastAlerts: new Set(),
 
-    theme: "dark"
+    theme: "dark",
+
+    devices: []
 };
 
 // ========================================
@@ -46,6 +48,10 @@ function initializeSystem() {
     initializeCharts();
 
     initializeToast();
+
+    initializeEstadisticas();
+
+    initializeAlertas();
 
     startPolling();
 
@@ -183,6 +189,9 @@ function initializeDateTime() {
         updateDateTime,
         1000
     );
+
+    // Cargar dispositivos iniciales
+    cargarDispositivosIniciales();
 
 }
 
@@ -546,7 +555,6 @@ function initializeAlertChart() {
         data: {
 
             labels: [
-                "BAJA",
                 "MEDIA",
                 "ALTA",
                 "CRÍTICA"
@@ -556,11 +564,10 @@ function initializeAlertChart() {
 
                 label: "Alertas",
 
-                data: [0,0,0,0],
+                data: [0,0,0],
 
                 backgroundColor: [
 
-                    "#22c55e",
                     "#f59e0b",
                     "#ef4444",
                     "#991b1b"
@@ -700,7 +707,6 @@ function updateZoneChart(zonas) {
 
 function updateAlertChart(alertas) {
 
-    let baja = 0;
     let media = 0;
     let alta = 0;
     let critica = 0;
@@ -711,11 +717,12 @@ function updateAlertChart(alertas) {
             (alerta.severidad || "")
                 .toUpperCase();
 
-        if (sev === "BAJA") baja++;
-        else if (sev === "MEDIA") media++;
+        if (sev === "MEDIA") media++;
         else if (sev === "ALTA") alta++;
         else if (sev === "CRITICA") critica++;
-        else alta++;
+        else if (sev === "BAJA") {
+            // No contar BAJA
+        } else alta++;  // Default to alta
 
     });
 
@@ -723,7 +730,6 @@ function updateAlertChart(alertas) {
         state.charts.alert;
 
     chart.data.labels = [
-        "BAJA",
         "MEDIA",
         "ALTA",
         "CRÍTICA"
@@ -731,7 +737,6 @@ function updateAlertChart(alertas) {
 
     chart.data.datasets[0].data = [
 
-        baja,
         media,
         alta,
         critica
@@ -887,9 +892,12 @@ function renderDevices(dispositivos) {
                 </p>
 
                 <strong>
-                    ${(device.consumo || 0)
-                        .toFixed(2)} kWh
+                    ${device.consumo_total.toFixed(2)} kWh total
                 </strong>
+
+                <small>
+                    ${device.consumo_actual.toFixed(2)} kWh actual
+                </small>
 
             </div>
 
@@ -916,12 +924,11 @@ function renderDevices(dispositivos) {
                 </td>
 
                 <td>
-                    ${(device.consumo || 0)
-                        .toFixed(2)}
+                    ${device.consumo_total.toFixed(2)} / ${device.consumo_actual.toFixed(2)} kWh
                 </td>
 
                 <td>
-                    Ahora
+                    ${device.ultimo_evento}
                 </td>
 
             </tr>
@@ -950,22 +957,112 @@ function renderRecommendations(data) {
 
     }
 
-    container.innerHTML =
-        data.map(item => `
+    // Usar Map para evitar duplicados por dispositivo_id
+    const uniqueRecommendations = new Map();
 
-            <div class="recommendation-card">
+    data.forEach(item => {
+        uniqueRecommendations.set(item.dispositivo_id, item);
+    });
+
+    const html = Array.from(uniqueRecommendations.values()).map(item => `
+
+        <div class="alert-card recommendation">
+
+            <div class="alert-top">
 
                 <h4>
                     ${item.dispositivo_id}
                 </h4>
 
-                <p>
-                    ${item.recomendacion}
-                </p>
+                <span class="severity info">
+                    RECOMENDACIÓN
+                </span>
 
             </div>
 
-        `).join("");
+            <p>
+                ${item.recomendacion}
+            </p>
+
+            <small>
+                Optimización automática
+            </small>
+
+        </div>
+
+    `).join("");
+
+    container.innerHTML = html;
+
+}
+
+// ========================================
+// ESTADISTICAS
+// ========================================
+
+function renderEstadisticas(estadisticas) {
+
+    const container =
+        document.getElementById(
+            "estadisticasGrid"
+        );
+
+    if (!estadisticas || !estadisticas.length) {
+
+        container.innerHTML =
+            "<p>Sin estadísticas disponibles</p>";
+
+        return;
+
+    }
+
+    const html = estadisticas.map(estadistica => `
+
+        <div class="stat-card">
+
+            <div class="stat-header">
+
+                <h4>
+                    Zona ${estadistica.zona}
+                </h4>
+
+                <i class="fas fa-chart-bar"></i>
+
+            </div>
+
+            <div class="stat-body">
+
+                <div class="stat-metric">
+
+                    <span class="label">
+                        Consumo Total
+                    </span>
+
+                    <span class="value">
+                        ${estadistica.total_consumo.toFixed(2)} kWh
+                    </span>
+
+                </div>
+
+                <div class="stat-metric">
+
+                    <span class="label">
+                        Promedio
+                    </span>
+
+                    <span class="value">
+                        ${estadistica.promedio.toFixed(2)} kWh
+                    </span>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    `).join("");
+
+    container.innerHTML = html;
 
 }
 
@@ -1105,6 +1202,62 @@ function updateInfrastructure() {
 }
 
 // ========================================
+// DISPOSITIVOS REALTIME
+// ========================================
+
+function actualizarDispositivoRealtime(data) {
+
+    if (!state.devices) {
+        state.devices = [];
+    }
+
+    const indice = state.devices.findIndex(
+        d => d.dispositivo_id === data.dispositivo_id
+    );
+
+    if (indice >= 0) {
+        // Actualizar dispositivo existente
+        state.devices[indice].consumo_actual = data.consumo_actual || 0;
+        state.devices[indice].ultimo_evento = data.timestamp;
+    } else {
+        // Agregar nuevo dispositivo
+        state.devices.push({
+            dispositivo_id: data.dispositivo_id,
+            consumo_actual: data.consumo_actual || 0,
+            ultimo_evento: data.timestamp,
+            consumo_total: 0,
+            zona: "DESCONOCIDA"
+        });
+    }
+
+    // Ordenar por consumo total
+    state.devices.sort((a, b) => b.consumo_total - a.consumo_total);
+
+    // Re-renderizar tabla completa
+    renderDevices(state.devices);
+
+}
+
+function cargarDispositivosIniciales() {
+
+    let today = new Date()
+        .toISOString()
+        .split("T")[0];
+
+    fetchJson(`/dispositivos/${today}`)
+        .then(dispositivos => {
+            if (Array.isArray(dispositivos)) {
+                state.devices = dispositivos;
+                renderDevices(state.devices);
+            }
+        })
+        .catch(error => {
+            console.error("Error cargando dispositivos:", error);
+        });
+
+}
+
+// ========================================
 // TOAST
 // ========================================
 
@@ -1148,6 +1301,143 @@ function hideToast() {
     document
         .getElementById("mainToast")
         .classList.remove("show");
+
+}
+
+// ========================================
+// ESTADISTICAS INIT
+// ========================================
+
+function initializeEstadisticas() {
+
+    // Set default date to today
+    const today = new Date().toISOString().split("T")[0];
+    document.getElementById("estadisticasFecha").value = today;
+
+    // Add event listener for calculate button
+    document
+        .getElementById("btnCalcularEstadisticas")
+        .addEventListener("click", async () => {
+
+            const fecha = document.getElementById("estadisticasFecha").value;
+
+            if (!fecha) {
+                showToast("Error", "Selecciona una fecha");
+                return;
+            }
+
+            try {
+                const response = await fetch(`/estadisticas/zona/${fecha}`);
+                const data = await response.json();
+
+                if (data.estadisticas) {
+                    renderEstadisticas(data.estadisticas);
+                } else {
+                    renderEstadisticas([]);
+                }
+
+            } catch (error) {
+                console.error("Error cargando estadísticas:", error);
+                showToast("Error", "No se pudieron cargar las estadísticas");
+            }
+
+        });
+
+    document
+        .getElementById("btnGuardarEstadisticas")
+        .addEventListener("click", async () => {
+
+            const zona = document.getElementById("estadisticasZona").value.trim();
+            const fecha = document.getElementById("estadisticasFecha").value;
+
+            if (!zona || !fecha) {
+                showToast("Error", "Completa zona y fecha");
+                return;
+            }
+
+            try {
+                const response = await fetch(
+                    `/estadisticas/zona/${zona}/${fecha}/calcular`,
+                    {
+                        method: "POST"
+                    }
+                );
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    showToast("Éxito", "Estadística guardada en Cassandra");
+                    // Refrescar lista de estadísticas
+                    document.getElementById("btnCalcularEstadisticas").click();
+                } else {
+                    showToast("Error", data.error || "No se pudo guardar");
+                }
+
+            } catch (error) {
+                console.error("Error guardando estadística:", error);
+                showToast("Error", "No se pudo guardar la estadística");
+            }
+
+        });
+
+}
+
+function initializeAlertas() {
+
+    document
+        .getElementById("btnGuardarAlertaDispositivo")
+        .addEventListener("click", async () => {
+
+            const dispositivo_id = document.getElementById("alertaDispositivoId").value.trim();
+            const zona = document.getElementById("alertaZona").value.trim();
+            const consumo = parseFloat(document.getElementById("alertaConsumo").value.trim());
+            const severidad = document.getElementById("alertaSeveridad").value.trim().toUpperCase();
+            const mensaje = document.getElementById("alertaMensaje").value.trim();
+            const fecha = new Date().toISOString();
+
+            if (!dispositivo_id || !zona || Number.isNaN(consumo) || !severidad || !mensaje) {
+                showToast("Error", "Completa todos los campos");
+                return;
+            }
+
+            try {
+                const response = await fetch(
+                    "/alertas/dispositivo",
+                    {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify({
+                            dispositivo_id,
+                            zona,
+                            consumo,
+                            severidad,
+                            recomendacion: mensaje,
+                            timestamp: fecha
+                        })
+                    }
+                );
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    showToast("Éxito", "Alerta guardada en Cassandra");
+                    document.getElementById("alertaDispositivoId").value = "";
+                    document.getElementById("alertaZona").value = "";
+                    document.getElementById("alertaConsumo").value = "";
+                    document.getElementById("alertaSeveridad").value = "";
+                    document.getElementById("alertaMensaje").value = "";
+                } else {
+                    showToast("Error", data.error || "No se pudo guardar la alerta");
+                }
+
+            } catch (error) {
+                console.error("Error guardando alerta:", error);
+                showToast("Error", "No se pudo guardar la alerta");
+            }
+
+        });
 
 }
 
