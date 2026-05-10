@@ -1159,6 +1159,60 @@ body {
 }
 
 /* =========================================
+   SEVERITY BADGES
+========================================= */
+
+.severity {
+
+    padding: 4px 10px;
+
+    border-radius: 12px;
+
+    font-size: 0.75rem;
+
+    font-weight: 700;
+
+    text-transform: uppercase;
+
+    letter-spacing: 0.5px;
+}
+
+.severity.baja {
+
+    background: rgba(16,185,129,0.2);
+
+    color: var(--green);
+}
+
+.severity.media {
+
+    background: rgba(245,158,11,0.2);
+
+    color: var(--yellow);
+}
+
+.severity.alta {
+
+    background: rgba(239,68,68,0.2);
+
+    color: var(--red);
+}
+
+.severity.critica {
+
+    background: rgba(153,27,27,0.3);
+
+    color: #fca5a5;
+}
+
+.severity.info {
+
+    background: rgba(59,130,246,0.2);
+
+    color: var(--blue);
+}
+
+/* =========================================
    TABLES
 ========================================= */
 
