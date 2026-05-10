@@ -260,12 +260,12 @@ async function loadData() {
 
     try {
 
-        const today =
+        let today =
             new Date()
                 .toISOString()
                 .split("T")[0];
 
-        const [
+        let [
 
             dashboard,
 
@@ -290,6 +290,55 @@ async function loadData() {
             fetchJson(`/zonas/${today}`)
 
         ]);
+
+        // If today has no usable data, try yesterday
+        const hasTodayData =
+            alertas.length > 0 ||
+            (dashboard && dashboard.alertas_hoy > 0) ||
+            (zonas && zonas.labels && zonas.labels.length > 0) ||
+            (dispositivos && dispositivos.length > 0);
+
+        if (!hasTodayData) {
+
+            const yesterday = new Date(
+                Date.now() - 86400000
+            ).toISOString().split("T")[0];
+
+            [
+
+                dashboard,
+
+                alertas,
+
+                dispositivos,
+
+                recomendaciones,
+
+                zonas
+
+            ] = await Promise.all([
+
+                fetchJson(
+                    `/dashboard/${yesterday}`
+                ),
+
+                fetchJson(
+                    `/alertas/${yesterday}`
+                ),
+
+                fetchJson(
+                    `/dispositivos/${yesterday}`
+                ),
+
+                fetchJson(
+                    `/recomendaciones/${yesterday}`
+                ),
+
+                fetchJson(`/zonas/${yesterday}`)
+
+            ]);
+
+        }
 
         updateKPIs(
             dashboard,
@@ -499,20 +548,22 @@ function initializeAlertChart() {
             labels: [
                 "BAJA",
                 "MEDIA",
-                "ALTA"
+                "ALTA",
+                "CRÍTICA"
             ],
 
             datasets: [{
 
                 label: "Alertas",
 
-                data: [0,0,0],
+                data: [0,0,0,0],
 
                 backgroundColor: [
 
                     "#22c55e",
                     "#f59e0b",
-                    "#ef4444"
+                    "#ef4444",
+                    "#991b1b"
 
                 ]
 
@@ -641,7 +692,7 @@ function updateZoneChart(zonas) {
         zonas.labels || [];
 
     chart.data.datasets[0].data =
-        zonas.valores || [];
+        zonas.values || [];
 
     chart.update();
 
@@ -652,6 +703,7 @@ function updateAlertChart(alertas) {
     let baja = 0;
     let media = 0;
     let alta = 0;
+    let critica = 0;
 
     alertas.forEach(alerta => {
 
@@ -661,6 +713,8 @@ function updateAlertChart(alertas) {
 
         if (sev === "BAJA") baja++;
         else if (sev === "MEDIA") media++;
+        else if (sev === "ALTA") alta++;
+        else if (sev === "CRITICA") critica++;
         else alta++;
 
     });
@@ -668,11 +722,19 @@ function updateAlertChart(alertas) {
     const chart =
         state.charts.alert;
 
+    chart.data.labels = [
+        "BAJA",
+        "MEDIA",
+        "ALTA",
+        "CRÍTICA"
+    ];
+
     chart.data.datasets[0].data = [
 
         baja,
         media,
-        alta
+        alta,
+        critica
 
     ];
 
@@ -804,7 +866,7 @@ function renderDevices(dispositivos) {
             "<p>Sin dispositivos</p>";
 
         tbody.innerHTML =
-            "";
+            "<tr><td colspan=6>Sin dispositivos</td></tr>";
 
         return;
 
@@ -918,6 +980,12 @@ function renderHistory(alertas) {
             "historyTable"
         );
 
+    if (!alertas.length) {
+        table.innerHTML =
+            `<tr><td colspan="6">Sin registros históricos</td></tr>`;
+        return;
+    }
+
     table.innerHTML =
         alertas.map((a,index) => `
 
@@ -926,11 +994,11 @@ function renderHistory(alertas) {
                 <td>${index+1}</td>
 
                 <td>
-                    ${a.dispositivo_id}
+                    ${a.dispositivo_id || "-"}
                 </td>
 
                 <td>
-                    ${a.zona}
+                    ${a.zona || "-"}
                 </td>
 
                 <td>
@@ -939,11 +1007,11 @@ function renderHistory(alertas) {
                 </td>
 
                 <td>
-                    ${a.severidad}
+                    ${a.severidad || "-"}
                 </td>
 
                 <td>
-                    ${formatDate(a.timestamp)}
+                    ${a.timestamp ? formatDate(a.timestamp) : "-"}
                 </td>
 
             </tr>
@@ -962,12 +1030,25 @@ function renderZones(zonas) {
         zonas.labels || [];
 
     const valores =
-        zonas.valores || [];
+        zonas.values || [];
+
+    const zoneIdMap = {
+        "centro": "zonaCentro",
+        "sur": "zonaSur",
+        "norte": "zonaNorte",
+        "el alto": "zonaAlto",
+        "alto": "zonaAlto"
+    };
 
     labels.forEach((zona,index) => {
 
+        const normalized = zona
+            .trim()
+            .toLowerCase();
+
         const id =
-            `zona${capitalize(zona.toLowerCase())}`;
+            zoneIdMap[normalized] ||
+            `zona${normalized.replace(/\s+/g, "")}`;
 
         const element =
             document.getElementById(id);
@@ -975,11 +1056,27 @@ function renderZones(zonas) {
         if (element) {
 
             element.textContent =
-                `${valores[index].toFixed(2)} kWh`;
+                `${(valores[index] || 0).toFixed(2)} kWh`;
 
         }
 
     });
+
+    const zoneMap = document.getElementById("zoneMap");
+
+    if (zoneMap) {
+
+        zoneMap.innerHTML = labels.map((zona,index) => `
+            <div class="map-zone">
+                <h4>${zona}</h4>
+                <strong>${(valores[index] || 0).toFixed(2)} kWh</strong>
+                <p>
+                    ${(valores[index] || 0) > 0 ? "Consumo actual" : "Sin datos"}
+                </p>
+            </div>
+        `).join("");
+
+    }
 
 }
 
